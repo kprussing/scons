@@ -480,6 +480,7 @@ OptionsParser = FakeOptionParser()
 def AddOption(*args, **kw):
     if 'default' not in kw:
         kw['default'] = None
+    global OptionsParser
     result = OptionsParser.add_local_option(*args, **kw)
     return result
 
@@ -986,7 +987,7 @@ def _main(parser):
             xmit_args.append(a)
         else:
             targets.append(a)
-    SCons.Script._Add_Targets(targets + parser.rargs)
+    SCons.Script._Add_Targets(targets + parser.largs)
     SCons.Script._Add_Arguments(xmit_args)
 
     # If stdout is not a tty, replace it with a wrapper object to call flush
@@ -1319,7 +1320,7 @@ def _exec_main(parser, values):
     sconsflags = os.environ.get('SCONSFLAGS', '')
     all_args = sconsflags.split() + sys.argv[1:]
 
-    options, args = parser.parse_args(all_args, values)
+    options, args = parser.parse_known_args(all_args, values)
 
     if isinstance(options.debug, list) and "pdb" in options.debug:
         import pdb
@@ -1365,7 +1366,7 @@ def main():
 
     from . import SConsOptions
     parser = SConsOptions.Parser(version)
-    values = SConsOptions.SConsValues(parser.get_default_values())
+    values = parser.get_default_values()
 
     OptionsParser = parser
 

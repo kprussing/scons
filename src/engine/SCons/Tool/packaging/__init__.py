@@ -212,7 +212,7 @@ def generate(env):
         AddOption('--package-type',
                   dest='package_type',
                   default=None,
-                  type="string",
+                  type=str,
                   action="store",
                   help='The type of package to create.')
 

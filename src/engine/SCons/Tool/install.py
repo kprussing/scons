@@ -355,7 +355,7 @@ def generate(env):
         added = 1
         AddOption('--install-sandbox',
                   dest='install_sandbox',
-                  type="string",
+                  type=str,
                   action="store",
                   help='A directory under which all installed files will be placed.')
 
