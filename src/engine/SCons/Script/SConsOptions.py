@@ -65,7 +65,7 @@ def diskcheck_convert(value):
     return result
 
 
-class SConsValues(optparse.Values):
+class SConsValues(argparse.Namespace):
     """
     Holder class for uniform access to SCons options, regardless
     of whether or not they can be set on the command line or in the
@@ -279,13 +279,46 @@ class SConsOptionGroup(optparse.OptionGroup):
         result = result + optparse.OptionContainer.format_help(self, formatter)
         return result
 
-class SConsOptionParser(optparse.OptionParser):
+class SConsOptionParser(argparse.ArgumentParser):
+    """
+    A subclass for SCons-specific option parsing.
+
+    SCons options are either set by the core script or the user and we
+    want to abstract away the lower level details of the actual parser.
+    Historically, SCons had to extend :class:`optparse.OptionParser` in
+    order to handle complex parsing.  The new way is to use the
+    :class:`argparse.ArgumentParser`, because it already handles the
+    advanced option parsing.  However, we want to change as little about
+    the parser as possible.
+    """
     preserve_unknown_options = False
 
-    def error(self, msg):
-        # overridden OptionValueError exception handler
+    def __init__(self, *args, **kwargs):
+        super(SConsOptionParser, self).__init__(*args, **kwargs)
+        self.values = None
+        self.largs = [] # Left over arguments
+        self.local_option_group = None
+
+    def parse_args(self, args=None, namespace=None):
+        f = super(SConsOptionParser, self).parse_args
+        values = f(args, namespace if namespace else self.values)
+        self.values = SConsValues(values)
+        return self.values
+
+    def parse_known_args(self, args=None, namespace=None):
+        f = super(SConsOptionParser, self).parse_known_args
+        values, largs = f(args, namespace if namespace else self.values)
+        self.values = SConsValues(values)
+        self.largs.extend(largs)
+        return self.values, self.largs
+
+    def get_default_values(self):
+        return self.parse_args()
+
+    def error(self, message):
+        # overridden ArgumentParser exception handler
         self.print_usage(sys.stderr)
-        sys.stderr.write("SCons Error: %s\n" % msg)
+        sys.stderr.write("SCons Error: %s\n" % message)
         sys.exit(2)
 
     def _process_long_opt(self, rargs, values):
@@ -431,14 +464,11 @@ class SConsOptionParser(optparse.OptionParser):
         command-line option.  We add the option to a separate option
         group for the local options, creating the group if necessary.
         """
-        try:
-            group = self.local_option_group
-        except AttributeError:
-            group = SConsOptionGroup(self, 'Local Options')
-            group = self.add_option_group(group)
+        if self.local_option_group is None:
+            group = self.add_argument_group('Local Options')
             self.local_option_group = group
 
-        result = group.add_option(*args, **kw)
+        result = group.add_argument(*args, **kw)
 
         if result:
             # The option was added successfully.  We now have to add the
@@ -462,10 +492,10 @@ def Parser(version):
 
     formatter = lambda prog: argparse.HelpFormatter(prog, max_help_position=30)
 
-    op = argparse.ArgumentParser(allow_abbrev=False,
-                                 add_help=False,
-                                 formatter_class=formatter,
-                                 usage="scons [OPTION] [TARGET] ...",)
+    op = SConsOptionParser(allow_abbrev=False,
+                           add_help=False,
+                           formatter_class=formatter,
+                           usage="scons [OPTION] [TARGET] ...",)
 
     op.preserve_unknown_options = True
     op.add_argument("-v", "--version", action="version", version=version)
@@ -581,21 +611,27 @@ def Parser(version):
         def __call__(self, parser, namespace, value__, option_string=None,
                      debug_options=debug_options,
                      deprecated_debug_options=deprecated_debug_options):
-            for value in value__.split(','):
+            for value in [v for vs in value__ for v in vs.split(',')]:
                 if value in debug_options:
-                    parser.values.debug.append(value)
+                    try:
+                        parser.values.debug.append(value)
+                    except AttributeError:
+                        setattr(parser.values, "debug", [value])
                 elif value in list(deprecated_debug_options.keys()):
-                    parser.values.debug.append(value)
+                    try:
+                        parser.values.debug.append(value)
+                    except AttributeError:
+                        setattr(parser.values, "debug", [value])
                     try:
                         parser.values.delayed_warnings
                     except AttributeError:
-                        parser.values.delayed_warnings = []
+                        setattr(parser.values, "delayed_warnings", [])
                     msg = deprecated_debug_options[value]
                     w = "The --debug={0} option is deprecated{1}.".format(value, msg)
                     t = (SCons.Warnings.DeprecatedDebugOptionsWarning, w)
                     parser.values.delayed_warnings.append(t)
                 else:
-                    raise ArgumentError(opt_invalid('debug', value, debug_options))
+                    raise ArgumentError(value, opt_invalid('debug', value, debug_options))
 
     opt_debug_help = "Print various types of debugging information: {0}.".format(
                      ", ".join(debug_options))
@@ -611,7 +647,7 @@ def Parser(version):
             try:
                 diskcheck_value = diskcheck_convert(value)
             except ValueError as e:
-                raise ArgumentError("`{0}' is not a valid diskcheck type".format(e))
+                raise ArgumentError(value, "`{0}' is not a valid diskcheck type".format(e))
             setattr(parser.values, namespace.dest, diskcheck_value)
 
     op.add_argument('--diskcheck',
@@ -624,7 +660,7 @@ def Parser(version):
     class SConsDuplicate(argparse.Action):
         def __call__(self, parser, namespace, value, option_string=None):
             if not value in SCons.Node.FS.Valid_Duplicates:
-                raise ArgumentError(opt_invalid('duplication', value,
+                raise ArgumentError(value, opt_invalid('duplication', value,
                                                 SCons.Node.FS.Valid_Duplicates))
             setattr(parser.values, namespace.dest, value)
             # Set the duplicate style right away so it can affect linking
@@ -804,8 +840,11 @@ def Parser(version):
                 elif o == 'status':
                     tp.status = True
                 else:
-                    raise ArgumentError(opt_invalid('--tree', o, tree_options))
-            parser.values.tree_printers.append(tp)
+                    raise ArgumentError(o, opt_invalid('--tree', o, tree_options))
+            try:
+                parser.values.tree_printers.append(tp)
+            except AttributeError:
+                setattr(parser.values, "tree_printers", [tp])
 
     opt_tree_help = "Print a dependency tree in various formats: {0}.".format(
                     ", ".join(tree_options))
@@ -834,7 +873,10 @@ def Parser(version):
                      tree_options=tree_options):
             if SCons.Util.is_String(value):
                 value = value.split(',')
-            parser.values.warn.extend(value)
+            try:
+                parser.values.warn.extend(value)
+            except AttributeError:
+                setattr(parser.values, "warn", value)
 
     op.add_argument('--warn', '--warning',
                     nargs=1, type=str,
