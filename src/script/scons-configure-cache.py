@@ -120,7 +120,7 @@ parser.add_argument('--show',
                     help="show current configuration")
 
 # Get the command line as a dict without any of the unspecified entries.
-args = dict([x for x in vars(parser.parse_args()).items() if x[1]])
+args = dict([x for x in vars(parser.parse_known_args()[0]).items() if x[1]])
 
 # It seems somewhat strange to me, but positional arguments don't get the -
 # in the name changed to _, whereas optional arguments do...

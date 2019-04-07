@@ -163,7 +163,7 @@ version                 Prints SCons version information.
 
         options = copy.deepcopy(self.options)
 
-        options, targets = self.parser.parse_args(argv[1:], values=options)
+        options, targets = self.parser.parse_known_args(argv[1:], values=options)
 
         SCons.Script.COMMAND_LINE_TARGETS = targets
 

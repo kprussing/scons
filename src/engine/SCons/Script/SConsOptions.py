@@ -313,7 +313,8 @@ class SConsOptionParser(argparse.ArgumentParser):
         return self.values, self.largs
 
     def get_default_values(self):
-        return self.parse_args()
+        values, _ = self.parse_known_args()
+        return values
 
     def error(self, message):
         # overridden ArgumentParser exception handler

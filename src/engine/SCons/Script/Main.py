@@ -1066,7 +1066,7 @@ def _main(parser):
     # was specified on the command line.
 
     parser.preserve_unknown_options = False
-    parser.parse_args(parser.largs, options)
+    parser.parse_known_args(parser.largs, options)
 
     if options.help:
         help_text = SCons.Script.help_text
