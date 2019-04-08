@@ -617,22 +617,22 @@ def Parser(version):
             for value in [v for vs in value__ for v in vs.split(',')]:
                 if value in debug_options:
                     try:
-                        parser.values.debug.append(value)
+                        namespace.debug.append(value)
                     except AttributeError:
-                        setattr(parser.values, "debug", [value])
+                        setattr(namespace, "debug", [value])
                 elif value in list(deprecated_debug_options.keys()):
                     try:
-                        parser.values.debug.append(value)
+                        namespace.debug.append(value)
                     except AttributeError:
-                        setattr(parser.values, "debug", [value])
+                        setattr(namespace, "debug", [value])
                     try:
-                        parser.values.delayed_warnings
+                        namespace.delayed_warnings
                     except AttributeError:
-                        setattr(parser.values, "delayed_warnings", [])
+                        setattr(namespace, "delayed_warnings", [])
                     msg = deprecated_debug_options[value]
                     w = "The --debug={0} option is deprecated{1}.".format(value, msg)
                     t = (SCons.Warnings.DeprecatedDebugOptionsWarning, w)
-                    parser.values.delayed_warnings.append(t)
+                    namespace.delayed_warnings.append(t)
                 else:
                     raise ArgumentError(value, opt_invalid('debug', value, debug_options))
 
@@ -651,7 +651,7 @@ def Parser(version):
                 diskcheck_value = diskcheck_convert(value)
             except ValueError as e:
                 raise ArgumentError(value, "`{0}' is not a valid diskcheck type".format(e))
-            setattr(parser.values, namespace.dest, diskcheck_value)
+            setattr(namespace, namespace.dest, diskcheck_value)
 
     op.add_argument('--diskcheck',
                     nargs=1, type=str,
@@ -665,7 +665,7 @@ def Parser(version):
             if not value in SCons.Node.FS.Valid_Duplicates:
                 raise ArgumentError(value, opt_invalid('duplication', value,
                                                 SCons.Node.FS.Valid_Duplicates))
-            setattr(parser.values, namespace.dest, value)
+            setattr(namespace, namespace.dest, value)
             # Set the duplicate style right away so it can affect linking
             # of SConscript files.
             SCons.Node.FS.set_duplicate(value)
@@ -724,8 +724,8 @@ def Parser(version):
 
     class SConsImplicitDeps(argparse.Action):
         def __call__(self, parser, namespace, value, option_string=None):
-            setattr(parser.values, 'implicit_cache', True)
-            setattr(parser.values, namespace.dest, True)
+            setattr(namespace, 'implicit_cache', True)
+            setattr(namespace, namespace.dest, True)
 
     op.add_argument('--implicit-deps-changed',
                     dest="implicit_deps_changed", default=False,
@@ -845,9 +845,9 @@ def Parser(version):
                 else:
                     raise ArgumentError(o, opt_invalid('--tree', o, tree_options))
             try:
-                parser.values.tree_printers.append(tp)
+                namespace.tree_printers.append(tp)
             except AttributeError:
-                setattr(parser.values, "tree_printers", [tp])
+                setattr(namespace, "tree_printers", [tp])
 
     opt_tree_help = "Print a dependency tree in various formats: {0}.".format(
                     ", ".join(tree_options))
@@ -877,9 +877,9 @@ def Parser(version):
             if SCons.Util.is_String(value):
                 value = value.split(',')
             try:
-                parser.values.warn.extend(value)
+                namespace.warn.extend(value)
             except AttributeError:
-                setattr(parser.values, "warn", value)
+                setattr(namespace, "warn", value)
 
     op.add_argument('--warn', '--warning',
                     nargs=1, type=str,
