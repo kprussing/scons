@@ -295,26 +295,28 @@ class SConsOptionParser(argparse.ArgumentParser):
 
     def __init__(self, *args, **kwargs):
         super(SConsOptionParser, self).__init__(*args, **kwargs)
-        self.values = None
-        self.largs = [] # Left over arguments
+        self.values = SConsValues(argparse.Namespace)
+        self.largs = None
         self.local_option_group = None
 
     def parse_args(self, args=None, namespace=None):
         f = super(SConsOptionParser, self).parse_args
         values = f(args, namespace if namespace else self.values)
-        self.values = SConsValues(values)
+        if values is not self.values:
+            self.values = SConsValues(values)
         return self.values
 
     def parse_known_args(self, args=None, namespace=None):
         f = super(SConsOptionParser, self).parse_known_args
-        values, largs = f(args, namespace if namespace else self.values)
-        self.values = SConsValues(values)
-        self.largs.extend(largs)
+        values, self.largs = f(args if args else self.largs,
+                               namespace if namespace else self.values)
+        if values is not self.values:
+            self.values = SConsValues(values)
         return self.values, self.largs
 
     def get_default_values(self):
-        values, _ = self.parse_known_args()
-        return values
+        self.parse_known_args()
+        return self.values
 
     def error(self, message):
         # overridden ArgumentParser exception handler
@@ -481,7 +483,7 @@ class SConsOptionParser(argparse.ArgumentParser):
             # available if the user turns around and does a GetOption()
             # right away.
             setattr(self.values.__defaults__, result.dest, result.default)
-            self.reparse_local_options()
+            self.parse_known_args(self.largs, self.values)
 
         return result
 
