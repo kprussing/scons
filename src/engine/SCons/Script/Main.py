@@ -977,17 +977,17 @@ def _main(parser):
 
     # That should cover (most of) the options.  Next, set up the variables
     # that hold command-line arguments, so the SConscript files that we
-    # read and execute have access to them.
-    targets = []
+    # read and execute have access to them.  The variables are the
+    # arguments that contain a '=' except for those that are long
+    # options.  Note this does preclude our ability to have targets
+    # whose path contains the '=' character.
     xmit_args = []
-    for a in parser.largs:
+    for i, a in enumerate(parser.largs):
         if a[:1] == '-':
             continue
         if '=' in a:
+            parser.largs.pop(i)
             xmit_args.append(a)
-        else:
-            targets.append(a)
-    SCons.Script._Add_Targets(targets + parser.largs)
     SCons.Script._Add_Arguments(xmit_args)
 
     # If stdout is not a tty, replace it with a wrapper object to call flush
@@ -1067,6 +1067,11 @@ def _main(parser):
 
     parser.preserve_unknown_options = False
     parser.parse_known_args(parser.largs, options)
+
+    # All of the arguments should have been processed at this point.
+    # All of the remaining command line arguments should be targets.
+    targets = parser.largs
+    SCons.Script._Add_Targets(targets)
 
     if options.help:
         help_text = SCons.Script.help_text
