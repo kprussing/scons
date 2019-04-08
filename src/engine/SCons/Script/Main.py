@@ -1155,8 +1155,6 @@ def _build_targets(fs, options, targets, target_top):
         if target_top:
             lookup_top = fs.Dir(target_top)
             target_top = None
-
-        targets = SCons.Script.BUILD_TARGETS
     else:
         # There are no targets specified on the command line,
         # so if they used -u, -U or -D, we may have to restrict
