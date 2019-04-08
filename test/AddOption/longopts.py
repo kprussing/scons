@@ -36,8 +36,8 @@ import TestSCons
 test = TestSCons.TestSCons()
 
 test.write('SConstruct', """\
-AddOption('--myargument', dest='myargument', type='string', default='gully')
-AddOption('--myarg', dest='myarg', type='string', default='balla')
+AddOption('--myargument', dest='myargument', type=str, default='gully')
+AddOption('--myarg', dest='myarg', type=str, default='balla')
 print("myargument: " + str(GetOption('myargument')))
 print("myarg: " + str(GetOption('myarg')))
 """)

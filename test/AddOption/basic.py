@@ -42,7 +42,7 @@ AddOption('--prefix',
           nargs=1,
           dest='prefix',
           action='store',
-          type='string',
+          type=str,
           metavar='DIR',
           help='installation prefix')
 f = GetOption('force')

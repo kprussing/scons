@@ -40,7 +40,7 @@ AddOption('--install',
           default='/default/directory',
           const='/called/default/directory',
           action='store',
-          type='string',
+          type=str,
           metavar='DIR',
           help='installation directory')
 print(GetOption('install'))
