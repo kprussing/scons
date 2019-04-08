@@ -25,8 +25,8 @@
 __revision__ = "__FILE__ __REVISION__ __DATE__ __DEVELOPER__"
 
 """
-Verify use of the nargs='?' keyword argument to specify a long
-command-line option with an optional argument value.
+Verify use of the nargs keyword argument to specify a command-line
+option with a variable number of argument values.
 """
 
 import TestSCons
@@ -56,16 +56,15 @@ test.run('-Q -q next-arg',
 test.run('-Q -q . --install',
          stdout="/called/default/directory\n")
 
-test.run('-Q -q . --install next-arg',
-         stdout="/called/default/directory\n",
-         status=1)
+test.run('-Q -q . --install /command/line/directory',
+         stdout="/command/line/directory\n")
 
 test.run('-Q -q . first-arg --install',
          stdout="/called/default/directory\n",
          status=1)
 
-test.run('-Q -q . first-arg --install next-arg',
-         stdout="/called/default/directory\n",
+test.run('-Q -q . first-arg --install /command/line/directory',
+         stdout="/command/line/directory\n",
          status=1)
 
 test.run('-Q -q . --install=/command/line/directory',
@@ -84,18 +83,15 @@ test.run('-Q -q . first-arg --install=/command/line/directory next-arg',
          status=1)
 
 
-test.write('SConstruct', """\
-AddOption('-X', nargs='?')
+test.write('SConstruct', """
+AddOption('--one')
+AddOption('--two', nargs=2)
+print(GetOption('one'))
+print(GetOption('two'))
 """)
 
-expect = r"""
-scons: \*\*\* option -X: nargs='\?' is incompatible with short options
-File "[^"]+", line \d+, in \S+
-"""
-
-test.run(status=2, stderr=expect, match=TestSCons.match_re)
-
-
+test.run('-Q -q --one=a --two b c',
+         stdout="a\n['b', 'c']\n")
 
 test.pass_test()
 
