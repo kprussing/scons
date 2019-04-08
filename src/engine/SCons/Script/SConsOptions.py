@@ -470,6 +470,8 @@ class SConsOptionParser(argparse.ArgumentParser):
         if self.local_option_group is None:
             group = self.add_argument_group('Local Options')
             self.local_option_group = group
+        else:
+            group = self.local_option_group
 
         result = group.add_argument(*args, **kw)
 
