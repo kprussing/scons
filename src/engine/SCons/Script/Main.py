@@ -981,12 +981,12 @@ def _main(parser):
     # options.  Note this does preclude our ability to have targets
     # whose path contains the '=' character.
     xmit_args = []
-    for i, a in enumerate(parser.largs):
+    for a in reversed(parser.largs):
         if a[:1] == '-':
             continue
         if '=' in a:
-            parser.largs.pop(i)
-            xmit_args.append(a)
+            xmit_args.insert(0, a)
+            parser.largs.remove(a)
     SCons.Script._Add_Arguments(xmit_args)
 
     # If stdout is not a tty, replace it with a wrapper object to call flush
