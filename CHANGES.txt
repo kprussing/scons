@@ -12,6 +12,9 @@ NOTE: The last release to support Python 3.7 or Python 3.8 is 4.11.0.
 
 RELEASE  VERSION/DATE TO BE FILLED IN LATER
 
+  From Thaddeus Crews:
+    - Removed Python 3.7 & 3.8 support.
+
   From Mats Wichmann:
     - Undo, for now, the 4.11.0 change (from PR 4875) to read a
       saved-Variables file using a File node. There were unanticipated

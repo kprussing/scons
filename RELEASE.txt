@@ -23,6 +23,13 @@ DEPRECATED FUNCTIONALITY
 
 - List anything that's been deprecated since the last release
 
+REMOVED FUNCTIONALITY
+------------------------
+
+- List anything that's been outright removed since the last release
+
+- Removed Python 3.7 & 3.8 support.
+
 CHANGED/ENHANCED EXISTING FUNCTIONALITY
 ---------------------------------------
 
