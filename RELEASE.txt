@@ -63,7 +63,9 @@ DOCUMENTATION
 DEVELOPMENT
 -----------
 
-- List visible changes in the way SCons is developed
+- List visible changes in the way SCons is 
+
+- ty: Initial support setup within `pyproject.toml`.
 
 Thanks to the following contributors listed below for their contributions to this release.
 ==========================================================================================
