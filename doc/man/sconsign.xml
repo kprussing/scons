@@ -127,7 +127,7 @@ is assumed by default.
 </para>
 
 <para>
-<emphasis>Deprecated since version NEXT_RELEASE</emphasis>:
+<emphasis>Deprecated since version 4.11.0</emphasis>:
 The old-style signature-file-per-directory mode is deprecated.
 </para>
 

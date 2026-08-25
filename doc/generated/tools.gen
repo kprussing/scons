@@ -220,6 +220,18 @@ It also selects all found from the list
 </para>
 
 <para>
+On the BSD systems whose base compiler is LLVM/clang
+(FreeBSD and OpenBSD), the default tools list matches
+the Linux one except that the C compiler is selected
+(first-found) from
+&t-link-clang;, &t-link-gcc;, &t-link-intelc;, &t-link-icc;,
+&t-link-cc;
+and the C++ compiler from
+&t-link-clangxx;, &t-link-gXX;, &t-link-intelc;, &t-link-icc;,
+&t-link-cXX;.
+</para>
+
+<para>
 Default lists for other platforms can be found by
 examining the &scons;
 source code (see
@@ -834,8 +846,9 @@ Sets construction variables for the
     <term>packaging</term>
     <listitem><para>
 Sets construction variables for the &b-link-Package; Builder.
-If this tool is enabled, the <option>--package-type</option>
-command-line option is also enabled.
+If this tool is enabled, the
+<link linkend="opt-package-type"><option>--package-type</option></link>
+command-line option is made available.
 </para>
 </listitem>
   </varlistentry>
@@ -863,112 +876,13 @@ Sets construction variables for the &pdftex; utility.
   <varlistentry id="t-python">
     <term>python</term>
     <listitem><para>
-Loads the Python source scanner into the invoking environment.
+Loads the &Python; source scanner into the invoking environment.
 When loaded, the scanner will attempt to find implicit
-dependencies for any Python source files in the list of sources
+dependencies for any &Python; source files in the list of sources
 provided to an Action that uses this environment.
 </para>
 <para><emphasis>Available since &scons; 4.0.</emphasis>.</para>
 </listitem>
-  </varlistentry>
-  <varlistentry id="t-qt">
-    <term>qt</term>
-    <listitem><para>
-Placeholder tool to alert anyone still using qt tools to switch to qt3 or newer tool.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="t-qt3">
-    <term>qt3</term>
-    <listitem><para>
-Sets &consvars; for building Qt3 applications.
-</para>
-
-<note><para>
-This tool is only suitable for building targeted to Qt3,
-which is obsolete
-(<emphasis>the tool is deprecated since 4.3,
-and was renamed to qt3 in 4.5.0.
-</emphasis>).
-There are contributed tools for Qt4 and Qt5, see
-<ulink url="https://github.com/SCons/scons-contrib">
-https://github.com/SCons/scons-contrib</ulink>.
-Qt4 has also passed end of life for standard support (in Dec 2015).
-</para></note>
-
-<para>
-Note paths for these &consvars; are assembled
-using the <function>os.path.join</function> method
-so they will have the appropriate separator at runtime,
-but are listed here in the various
-entries only with the <literal>'/'</literal> separator
-for simplicity.
-</para>
-
-<para>
-In addition, the &consvars;
-&cv-link-CPPPATH;,
-&cv-link-LIBPATH; and
-&cv-link-LIBS; may be modified
-and the variables
-&cv-link-PROGEMITTER;, &cv-link-SHLIBEMITTER; and &cv-link-LIBEMITTER;
-are modified. Because the build-performance is affected when using this tool,
-you have to explicitly specify it at Environment creation:
-</para>
-
-<example_commands>
-Environment(tools=['default','qt3'])
-</example_commands>
-
-<para>
-The &t-qt3; tool supports the following operations:
-</para>
-
-<para>
-<emphasis role="strong">Automatic moc file generation from header files.</emphasis>
-You do not have to specify moc files explicitly, the tool does it for you.
-However, there are a few preconditions to do so: Your header file must have
-the same basename as your implementation file and must stay in the same
-directory. It must have one of the suffixes
-<filename>.h</filename>,
-<filename>.hpp</filename>,
-<filename>.H</filename>,
-<filename>.hxx</filename>,
-<filename>.hh</filename>.
-You can turn off automatic moc file generation by setting
-&cv-link-QT3_AUTOSCAN; to <constant>False</constant>.
-See also the corresponding
-&b-link-Moc; Builder.
-</para>
-
-<para>
-<emphasis role="strong">Automatic moc file generation from C++ files.</emphasis>
-As described in the Qt documentation, include the moc file at the end of
-the C++ file. Note that you have to include the file, which is generated
-by the transformation
-<literal>${QT3_MOCCXXPREFIX}&lt;basename&gt;${QT3_MOCCXXSUFFIX}</literal>, by default
-<filename>&lt;basename&gt;.mo</filename>. A warning is generated after building the moc file if you
-do not include the correct file. If you are using &f-link-VariantDir;, you may
-need to specify <parameter>duplicate=True</parameter>.
-You can turn off automatic moc file generation by setting &cv-QT3_AUTOSCAN; to
-<literal>False</literal>. See also the corresponding
-&b-link-Moc; Builder.
-</para>
-
-<para>
-<emphasis role="strong">Automatic handling of .ui files.</emphasis>
-The implementation files generated from <filename>.ui</filename>
-files are handled much the same as yacc or lex files.
-Each <command>.ui</command> file given as a source of &b-link-Program;,
-&b-link-Library; or &b-link-SharedLibrary;
-will generate three files: the declaration file, the
-implementation file and a moc file. Because there are also generated headers,
-you may need to specify <parameter>duplicate=True</parameter> in calls to
-&f-link-VariantDir;.
-See also the corresponding
-&b-link-Uic; Builder.
-</para>
-<para>Sets: &cv-link-QT3DIR;, &cv-link-QT3_AUTOSCAN;, &cv-link-QT3_BINPATH;, &cv-link-QT3_CPPPATH;, &cv-link-QT3_LIB;, &cv-link-QT3_LIBPATH;, &cv-link-QT3_MOC;, &cv-link-QT3_MOCCXXPREFIX;, &cv-link-QT3_MOCCXXSUFFIX;, &cv-link-QT3_MOCFROMCXXCOM;, &cv-link-QT3_MOCFROMCXXFLAGS;, &cv-link-QT3_MOCFROMHCOM;, &cv-link-QT3_MOCFROMHFLAGS;, &cv-link-QT3_MOCHPREFIX;, &cv-link-QT3_MOCHSUFFIX;, &cv-link-QT3_UIC;, &cv-link-QT3_UICCOM;, &cv-link-QT3_UICDECLFLAGS;, &cv-link-QT3_UICDECLPREFIX;, &cv-link-QT3_UICDECLSUFFIX;, &cv-link-QT3_UICIMPLFLAGS;, &cv-link-QT3_UICIMPLPREFIX;, &cv-link-QT3_UICIMPLSUFFIX;, &cv-link-QT3_UISUFFIX;.</para><para>Uses: &cv-link-QT3DIR;.</para></listitem>
   </varlistentry>
   <varlistentry id="t-rmic">
     <term>rmic</term>

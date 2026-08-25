@@ -104,14 +104,14 @@ The CPython project retired 3.6 in Sept 2021:
 <ulink url="https://peps.python.org/pep-0494"/>.
 </para>
 <para>
-<emphasis>Changed in version NEXT_RELEASE:</emphasis>
+<emphasis>Changed in version 4.11.0:</emphasis>
 support for &Python; 3.7 is deprecated and will be removed
 in a future &SCons; release.
 The CPython project retired 3.7 in June 2023:
 <ulink url="https://peps.python.org/pep-0537"/>.
 </para>
 <para>
-<emphasis>Changed in version NEXT_RELEASE:</emphasis>
+<emphasis>Changed in version 4.11.0:</emphasis>
 support for &Python; 3.8 is deprecated and will be removed
 in a future &SCons; release.
 The CPython project retired 3.8 in Sept 2024:
@@ -482,6 +482,12 @@ On SGI IRIX, IBM AIX, Hewlett Packard HP-UX, and Oracle Solaris systems,
 searches for the native compiler tools
 (MIPSpro, Visual Age, aCC, and Forte tools respectively)
 and the GCC tool chain.
+On FreeBSD and OpenBSD,
+&scons;
+searches in order
+for the LLVM/clang tools,
+the GCC tool chain,
+and the Intel compiler tools.
 On all other platforms,
 including POSIX (Linux and UNIX) and macOS platforms,
 &scons;
@@ -1263,7 +1269,7 @@ the mechanisms in the specified order.</para>
         <literal>ninja</literal> (<emphasis>new in version 4.2</emphasis>)
         and
         <literal>legacy_sched_deprecated</literal>
-        (<emphasis>new in, and deprecated since, version NEXT_RELEASE</emphasis>).
+        (<emphasis>new in, and deprecated since, version 4.11.0</emphasis>).
       </para>
       <note>
       <para>
@@ -1273,7 +1279,7 @@ the mechanisms in the specified order.</para>
         The feature flag was introduced as <literal>legacy_sched</literal>
         in version 4.7.
         The legacy scheduler is due to be removed in a future release,
-        so the feature flag is now deprecated. In version NEXT_RELEASE,
+        so the feature flag is now deprecated. In version 4.11.0,
         it was renamed to <literal>legacy_sched_deprecated</literal>,
         so that existing users will receive a signal - due to the nature
         of experimental feature flags it is not possible to use the
@@ -2367,7 +2373,7 @@ can themselves refer to lists of names or nodes.</para>
   </listitem>
   </varlistentry>
 
-  <!--varlistentry>  Qt3 removed entirely in NEXT_RELEASE
+  <!--varlistentry>  Qt3 removed entirely in 4.11.0
   <term><emphasis role="bold">tool-qt-deprecated</emphasis></term>
   <listitem>
 <para>Warnings about the &t-link-qt; tool being deprecated.
@@ -8601,7 +8607,7 @@ its present value in 4.4, and contents were expanded.</emphasis>
     </listitem>
   </varlistentry>
 
-  <!--varlistentry>  Removed in NEXT_RELEASE: handled entirely by tool.
+  <!--varlistentry>  Removed in 4.11.0: handled entirely by tool.
     <term><envar>QTDIR</envar></term>
     <listitem>
 <para>If using the &t-link-qt; tool, this is the path to

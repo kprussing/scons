@@ -471,7 +471,8 @@ in this case.
 </para>
 
 <para>
-If the <option>--install-sandbox</option> command line
+If the
+<link linkend="opt-install-sandbox"><option>--install-sandbox</option></link>
 option is given, the target directory will be prefixed
 by the directory path specified.
 This is useful to test installation behavior without installing to
@@ -766,23 +767,6 @@ env.M4(target = 'foo.c', source = 'foo.c.m4')
 </example_commands>
 </listitem>
   </varlistentry>
-  <varlistentry id="b-Moc">
-    <term><function>Moc</function>()</term>
-    <term><replaceable>env</replaceable>.<methodname>Moc</methodname>()</term>
-    <listitem><para>
-Builds an output file from a <command>moc</command> input file.
-<command>moc</command> input files are either header files or C++ files.
-This builder is only available after using the
-tool &t-link-qt3;. See the &cv-link-QT3DIR; variable for more information.
-Example:
-</para>
-
-<example_commands>
-env.Moc('foo.h')  # generates moc_foo.cc
-env.Moc('foo.cpp')  # generates foo.moc
-</example_commands>
-</listitem>
-  </varlistentry>
   <varlistentry id="b-MOFiles">
     <term><function>MOFiles</function>()</term>
     <term><replaceable>env</replaceable>.<methodname>MOFiles</methodname>()</term>
@@ -857,7 +841,7 @@ env.MOFiles()
         Note &SCons; does not know how to construct project files for
         other languages (e.g. <filename>.csproj</filename> for C#,
         <filename>.vbproj</filename> for Visual Basic or
-        <filename>.pyproject</filename> for Python).
+        <filename>.pyproject</filename> for &Python;).
         </para>
       <para>
         For the <filename>.vcxproj</filename> file, the underlying
@@ -1511,7 +1495,9 @@ env = Environment(tools=['default', 'packaging'])
 &SCons; can build packages in a number of well known packaging formats.
 The target package type may be selected with the
 &cv-link-PACKAGETYPE; construction variable
-or the <option>--package-type</option> command line option.
+or the
+<link linkend="opt-package-type"><option>--package-type</option></link>
+command line option.
 The package type may be a list, in which case &SCons; will attempt
 to build packages for each type in the list. Example:
 </para>
@@ -2130,7 +2116,8 @@ env.Program(target='foo', source=['foo.o', 'bar.c', 'baz.f'])
   </para>
   <para>
     D sources can be compiled file-by-file as C and C++ source are, and
-    D is integrated into the &scons; Object and Program builders for
+    D is integrated into the &scons;
+    &b-link-Object; and &b-link-Program; builders for
     this model of build. D codes can though do whole source
     meta-programming (some of the testing frameworks do this). For this
     it is imperative that all sources are compiled and linked in a single
@@ -2603,7 +2590,7 @@ are automatically added to the target if they are not already present.
 
 <para>
 If a construction variable named &cv-link-SUBST_DICT; is present,
-it may be either a Python dictionary or a sequence of
+it may be either a &Python; dictionary or a sequence of
 (<replaceable>key</replaceable>, <replaceable>value</replaceable>) tuples.
 If it is a dictionary it is converted into a list of tuples
 with unspecified order,
@@ -2615,7 +2602,7 @@ it is unpredictable whether the expansion will occur.
 <para>
 Any occurrences of a key in the source
 are replaced by the corresponding value,
-which may be a Python callable function or a string.
+which may be a &Python; callable function or a string.
 If the value is a callable, it is called with no arguments to get a string.
 Strings are <emphasis>subst</emphasis>-expanded
 and the result replaces the key.
@@ -2719,8 +2706,8 @@ value of the
 the line separator is not emitted after the last string.
 Nested lists of source strings
 are flattened.
-Source strings need not literally be Python strings:
-they can be Nodes or Python objects that convert cleanly
+Source strings need not literally be &Python; strings:
+they can be Nodes or &Python; objects that convert cleanly
 to &f-link-Value; nodes.
 </para>
 
@@ -2941,32 +2928,6 @@ and
 <filename>foo_data.c</filename>
 files.
 </para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="b-Uic">
-    <term><function>Uic</function>()</term>
-    <term><replaceable>env</replaceable>.<methodname>Uic</methodname>()</term>
-    <listitem><para>
-Builds a header file, an implementation file and a moc file from an ui file.
-and returns the corresponding nodes in the that order.
-This builder is only available after using the tool &t-link-qt3;.
-Note: you can specify <filename>.ui</filename> files directly as source
-files to the &b-link-Program;,
-&b-link-Library; and &b-link-SharedLibrary; builders
-without using this builder. Using this builder lets you override the standard
-naming conventions (be careful: prefixes are always prepended to names of
-built files; if you don't want prefixes, you may set them to ``).
-See the &cv-link-QT3DIR; variable for more information.
-Example:
-</para>
-
-<example_commands>
-env.Uic('foo.ui')  # -&gt; ['foo.h', 'uic_foo.cc', 'moc_foo.cc']
-env.Uic(
-    target=Split('include/foo.h gen/uicfoo.cc gen/mocfoo.cc'),
-    source='foo.ui'
-)  # -&gt; ['include/foo.h', 'gen/uicfoo.cc', 'gen/mocfoo.cc']
-</example_commands>
 </listitem>
   </varlistentry>
   <varlistentry id="b-Zip">

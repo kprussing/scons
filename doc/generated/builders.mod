@@ -33,7 +33,6 @@ THIS IS AN AUTOMATICALLY-GENERATED FILE.  DO NOT EDIT.
 <!ENTITY b-Library "<function xmlns='http://www.scons.org/dbxsd/v1.0'>Library</function>">
 <!ENTITY b-LoadableModule "<function xmlns='http://www.scons.org/dbxsd/v1.0'>LoadableModule</function>">
 <!ENTITY b-M4 "<function xmlns='http://www.scons.org/dbxsd/v1.0'>M4</function>">
-<!ENTITY b-Moc "<function xmlns='http://www.scons.org/dbxsd/v1.0'>Moc</function>">
 <!ENTITY b-MOFiles "<function xmlns='http://www.scons.org/dbxsd/v1.0'>MOFiles</function>">
 <!ENTITY b-MSVSProject "<function xmlns='http://www.scons.org/dbxsd/v1.0'>MSVSProject</function>">
 <!ENTITY b-MSVSSolution "<function xmlns='http://www.scons.org/dbxsd/v1.0'>MSVSSolution</function>">
@@ -63,7 +62,6 @@ THIS IS AN AUTOMATICALLY-GENERATED FILE.  DO NOT EDIT.
 <!ENTITY b-Textfile "<function xmlns='http://www.scons.org/dbxsd/v1.0'>Textfile</function>">
 <!ENTITY b-Translate "<function xmlns='http://www.scons.org/dbxsd/v1.0'>Translate</function>">
 <!ENTITY b-TypeLibrary "<function xmlns='http://www.scons.org/dbxsd/v1.0'>TypeLibrary</function>">
-<!ENTITY b-Uic "<function xmlns='http://www.scons.org/dbxsd/v1.0'>Uic</function>">
 <!ENTITY b-Zip "<function xmlns='http://www.scons.org/dbxsd/v1.0'>Zip</function>">
 
 <!ENTITY b-env-CFile "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.CFile</function>">
@@ -91,7 +89,6 @@ THIS IS AN AUTOMATICALLY-GENERATED FILE.  DO NOT EDIT.
 <!ENTITY b-env-Library "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.Library</function>">
 <!ENTITY b-env-LoadableModule "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.LoadableModule</function>">
 <!ENTITY b-env-M4 "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.M4</function>">
-<!ENTITY b-env-Moc "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.Moc</function>">
 <!ENTITY b-env-MOFiles "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.MOFiles</function>">
 <!ENTITY b-env-MSVSProject "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.MSVSProject</function>">
 <!ENTITY b-env-MSVSSolution "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.MSVSSolution</function>">
@@ -121,7 +118,6 @@ THIS IS AN AUTOMATICALLY-GENERATED FILE.  DO NOT EDIT.
 <!ENTITY b-env-Textfile "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.Textfile</function>">
 <!ENTITY b-env-Translate "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.Translate</function>">
 <!ENTITY b-env-TypeLibrary "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.TypeLibrary</function>">
-<!ENTITY b-env-Uic "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.Uic</function>">
 <!ENTITY b-env-Zip "<function xmlns='http://www.scons.org/dbxsd/v1.0'>env.Zip</function>">
 
 <!--
@@ -155,7 +151,6 @@ THIS IS AN AUTOMATICALLY-GENERATED FILE.  DO NOT EDIT.
 <!ENTITY b-link-Library "<link linkend='b-Library' xmlns='http://www.scons.org/dbxsd/v1.0'><function>Library</function></link>">
 <!ENTITY b-link-LoadableModule "<link linkend='b-LoadableModule' xmlns='http://www.scons.org/dbxsd/v1.0'><function>LoadableModule</function></link>">
 <!ENTITY b-link-M4 "<link linkend='b-M4' xmlns='http://www.scons.org/dbxsd/v1.0'><function>M4</function></link>">
-<!ENTITY b-link-Moc "<link linkend='b-Moc' xmlns='http://www.scons.org/dbxsd/v1.0'><function>Moc</function></link>">
 <!ENTITY b-link-MOFiles "<link linkend='b-MOFiles' xmlns='http://www.scons.org/dbxsd/v1.0'><function>MOFiles</function></link>">
 <!ENTITY b-link-MSVSProject "<link linkend='b-MSVSProject' xmlns='http://www.scons.org/dbxsd/v1.0'><function>MSVSProject</function></link>">
 <!ENTITY b-link-MSVSSolution "<link linkend='b-MSVSSolution' xmlns='http://www.scons.org/dbxsd/v1.0'><function>MSVSSolution</function></link>">
@@ -185,7 +180,6 @@ THIS IS AN AUTOMATICALLY-GENERATED FILE.  DO NOT EDIT.
 <!ENTITY b-link-Textfile "<link linkend='b-Textfile' xmlns='http://www.scons.org/dbxsd/v1.0'><function>Textfile</function></link>">
 <!ENTITY b-link-Translate "<link linkend='b-Translate' xmlns='http://www.scons.org/dbxsd/v1.0'><function>Translate</function></link>">
 <!ENTITY b-link-TypeLibrary "<link linkend='b-TypeLibrary' xmlns='http://www.scons.org/dbxsd/v1.0'><function>TypeLibrary</function></link>">
-<!ENTITY b-link-Uic "<link linkend='b-Uic' xmlns='http://www.scons.org/dbxsd/v1.0'><function>Uic</function></link>">
 <!ENTITY b-link-Zip "<link linkend='b-Zip' xmlns='http://www.scons.org/dbxsd/v1.0'><function>Zip</function></link>">
 
 <!ENTITY b-link-env-CFile "<link linkend='b-CFile' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.CFile</function></link>">
@@ -213,7 +207,6 @@ THIS IS AN AUTOMATICALLY-GENERATED FILE.  DO NOT EDIT.
 <!ENTITY b-link-env-Library "<link linkend='b-Library' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.Library</function></link>">
 <!ENTITY b-link-env-LoadableModule "<link linkend='b-LoadableModule' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.LoadableModule</function></link>">
 <!ENTITY b-link-env-M4 "<link linkend='b-M4' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.M4</function></link>">
-<!ENTITY b-link-env-Moc "<link linkend='b-Moc' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.Moc</function></link>">
 <!ENTITY b-link-env-MOFiles "<link linkend='b-MOFiles' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.MOFiles</function></link>">
 <!ENTITY b-link-env-MSVSProject "<link linkend='b-MSVSProject' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.MSVSProject</function></link>">
 <!ENTITY b-link-env-MSVSSolution "<link linkend='b-MSVSSolution' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.MSVSSolution</function></link>">
@@ -243,5 +236,4 @@ THIS IS AN AUTOMATICALLY-GENERATED FILE.  DO NOT EDIT.
 <!ENTITY b-link-env-Textfile "<link linkend='b-Textfile' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.Textfile</function></link>">
 <!ENTITY b-link-env-Translate "<link linkend='b-Translate' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.Translate</function></link>">
 <!ENTITY b-link-env-TypeLibrary "<link linkend='b-TypeLibrary' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.TypeLibrary</function></link>">
-<!ENTITY b-link-env-Uic "<link linkend='b-Uic' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.Uic</function></link>">
 <!ENTITY b-link-env-Zip "<link linkend='b-Zip' xmlns='http://www.scons.org/dbxsd/v1.0'><function>env.Zip</function></link>">

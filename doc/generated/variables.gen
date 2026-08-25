@@ -917,8 +917,8 @@ directly into &cv-link-CCFLAGS; or &cv-link-CXXFLAGS;
 as the result will be non-portable
 and the directories will not be searched by the dependency scanner.
 &cv-CPPPATH; should be a list of path strings,
-or a single string, not a pathname list joined by
-Python's <systemitem>os.pathsep</systemitem>.
+or a single string, not a pathname list joined by the
+&Python; <systemitem>os.pathsep</systemitem> character.
 </para>
 
 <para>
@@ -1082,6 +1082,12 @@ depending on the specific C++ compiler being used.
     </term>
     <listitem><para>
 The D compiler to use.
+&SCons; provides tool modules for three D compilation systems:
+DMD (&t-link-dmd;), the reference compiler;
+LDC (&t-link-ldc;), the LLVM-based D compiler;
+and GDC (&t-link-gdc;), from the GNU Compiler Collection,
+searched in that order.
+Use a tool specifier if you need to prefer a specific compiler.
 See also &cv-link-SHDC; for compiling to shared objects.
 </para>
 </listitem>
@@ -1093,8 +1099,11 @@ See also &cv-link-SHDC; for compiling to shared objects.
     <listitem><para>
 The command line used to compile a D file to an object file.
 Any options specified in the &cv-link-DFLAGS; construction variable
-is included on this command line.
+are included on this command line.
 See also &cv-link-SHDCOM; for compiling to shared objects.
+See also the &b-link-ProgramAllAtOnce; builder
+for how to compile directly to an executable without
+making intermediate object files.
 </para>
 </listitem>
   </varlistentry>
@@ -1104,7 +1113,7 @@ See also &cv-link-SHDCOM; for compiling to shared objects.
     </term>
     <listitem><para>
 If set, the string displayed when a D source file
-is compiled to a (static) object file.
+is compiled to an object file.
 If not set, then &cv-link-DCOM; (the command line) is displayed.
 See also &cv-link-SHDCOMSTR; for compiling to shared objects.
 </para>
@@ -1115,7 +1124,7 @@ See also &cv-link-SHDCOMSTR; for compiling to shared objects.
       <envar>DDEBUG</envar>
     </term>
     <listitem><para>
-List of debug tags to enable when compiling.
+Debug tags to enable when compiling.
 </para>
 </listitem>
   </varlistentry>
@@ -1124,7 +1133,8 @@ List of debug tags to enable when compiling.
       <envar>DDEBUGPREFIX</envar>
     </term>
     <listitem><para>
-DDEBUGPREFIX.
+Prefix used for debug tags from &cv-link-DDEBUG;.
+Defaults vary by D compiler.
 </para>
 </listitem>
   </varlistentry>
@@ -1133,7 +1143,7 @@ DDEBUGPREFIX.
       <envar>DDEBUGSUFFIX</envar>
     </term>
     <listitem><para>
-DDEBUGSUFFIX.
+Suffix used for debug tags from &cv-link-DDEBUG;.
 </para>
 </listitem>
   </varlistentry>
@@ -1169,7 +1179,8 @@ section of an RPM
       <envar>DFILESUFFIX</envar>
     </term>
     <listitem><para>
-DFILESUFFIX.
+File suffix for D source files.
+The default is <literal>.d</literal>.
 </para>
 </listitem>
   </varlistentry>
@@ -1178,7 +1189,7 @@ DFILESUFFIX.
       <envar>DFLAGPREFIX</envar>
     </term>
     <listitem><para>
-DFLAGPREFIX.
+Prefix added to each element of &cv-link-DFLAGS;.
 </para>
 </listitem>
   </varlistentry>
@@ -1196,7 +1207,7 @@ General options that are passed to the D compiler.
       <envar>DFLAGSUFFIX</envar>
     </term>
     <listitem><para>
-DFLAGSUFFIX.
+Suffix added to each element of &cv-link-DFLAGS;.
 </para>
 </listitem>
   </varlistentry>
@@ -1205,7 +1216,8 @@ DFLAGSUFFIX.
       <envar>DI_FILE_DIR</envar>
     </term>
     <listitem><para>
-Path where .di files will be generated
+Path to search for D interface files,
+which are translations of C header files.
 </para>
 </listitem>
   </varlistentry>
@@ -1214,7 +1226,8 @@ Path where .di files will be generated
       <envar>DI_FILE_DIR_PREFIX</envar>
     </term>
     <listitem><para>
-Prefix to send the di path argument to compiler
+Prefix added to the name of the D interface file
+directory from &cv-link-DI_FILE_DIR;.
 </para>
 </listitem>
   </varlistentry>
@@ -1223,7 +1236,8 @@ Prefix to send the di path argument to compiler
       <envar>DI_FILE_DIR_SUFFFIX</envar>
     </term>
     <listitem><para>
-Suffix to send the di path argument to compiler
+Suffix added to the name of the D interface file
+directory from &cv-link-DI_FILE_DIR;.
 </para>
 </listitem>
   </varlistentry>
@@ -1232,7 +1246,9 @@ Suffix to send the di path argument to compiler
       <envar>DI_FILE_SUFFIX</envar>
     </term>
     <listitem><para>
-Suffix of d include files default is .di
+Suffix for D interface files,
+which are translations of C header files.
+The default is <literal>.di</literal>.
 </para>
 </listitem>
   </varlistentry>
@@ -1241,7 +1257,7 @@ Suffix of d include files default is .di
       <envar>DINCPREFIX</envar>
     </term>
     <listitem><para>
-DINCPREFIX.
+Prefix added to each path in &cv-link-DPATH;.
 </para>
 </listitem>
   </varlistentry>
@@ -1250,7 +1266,7 @@ DINCPREFIX.
       <envar>DINCSUFFIX</envar>
     </term>
     <listitem><para>
-DLIBFLAGSUFFIX.
+Suffix added to each path in &cv-link-DPATH;.
 </para>
 </listitem>
   </varlistentry>
@@ -1279,7 +1295,7 @@ into a list of Dir instances relative to the target being built.
       <envar>DLIB</envar>
     </term>
     <listitem><para>
-Name of the lib tool to use for D codes.
+Name of the static library tool for D code.
 </para>
 </listitem>
   </varlistentry>
@@ -1288,7 +1304,7 @@ Name of the lib tool to use for D codes.
       <envar>DLIBCOM</envar>
     </term>
     <listitem><para>
-The command line to use when creating libraries.
+The command line to use when linking a static library.
 </para>
 </listitem>
   </varlistentry>
@@ -1297,7 +1313,8 @@ The command line to use when creating libraries.
       <envar>DLIBDIRPREFIX</envar>
     </term>
     <listitem><para>
-DLIBLINKPREFIX.
+The command-line prefix for library search directories
+from &cv-link-LIBPATH; when linking D code.
 </para>
 </listitem>
   </varlistentry>
@@ -1306,7 +1323,8 @@ DLIBLINKPREFIX.
       <envar>DLIBDIRSUFFIX</envar>
     </term>
     <listitem><para>
-DLIBLINKSUFFIX.
+The command-line suffix for library search directories
+from &cv-link-LIBPATH; when linking D code.
 </para>
 </listitem>
   </varlistentry>
@@ -1315,7 +1333,16 @@ DLIBLINKSUFFIX.
       <envar>DLIBFLAGPREFIX</envar>
     </term>
     <listitem><para>
-DLIBFLAGPREFIX.
+Prefix added to each element of &cv-link-DLIBFLAGS;.
+</para>
+</listitem>
+  </varlistentry>
+  <varlistentry id="cv-DLIBFLAGS">
+    <term>
+      <envar>DLIBFLAGS</envar>
+    </term>
+    <listitem><para>
+The flags to pass to the library tool.
 </para>
 </listitem>
   </varlistentry>
@@ -1324,7 +1351,7 @@ DLIBFLAGPREFIX.
       <envar>DLIBFLAGSUFFIX</envar>
     </term>
     <listitem><para>
-DLIBFLAGSUFFIX.
+Suffix added to each element of &cv-link-DLIBFLAGS;.
 </para>
 </listitem>
   </varlistentry>
@@ -1333,7 +1360,7 @@ DLIBFLAGSUFFIX.
       <envar>DLIBLINKPREFIX</envar>
     </term>
     <listitem><para>
-DLIBLINKPREFIX.
+Prefix added to each library name from &cv-link-LIBS;.
 </para>
 </listitem>
   </varlistentry>
@@ -1342,7 +1369,7 @@ DLIBLINKPREFIX.
       <envar>DLIBLINKSUFFIX</envar>
     </term>
     <listitem><para>
-DLIBLINKSUFFIX.
+Suffix added to each library name from &cv-link-LIBS;.
 </para>
 </listitem>
   </varlistentry>
@@ -1371,7 +1398,7 @@ See also &cv-link-SHDLINKCOM; for linking shared objects.
       <envar>DLINKFLAGPREFIX</envar>
     </term>
     <listitem><para>
-DLINKFLAGPREFIX.
+Prefix added to each element of &cv-link-DLINKFLAGS;.
 </para>
 </listitem>
   </varlistentry>
@@ -1380,7 +1407,7 @@ DLINKFLAGPREFIX.
       <envar>DLINKFLAGS</envar>
     </term>
     <listitem><para>
-List of linker flags.
+Linker flags.
 See also &cv-link-SHDLINKFLAGS; for linking shared objects.
 </para>
 </listitem>
@@ -1390,7 +1417,7 @@ See also &cv-link-SHDLINKFLAGS; for linking shared objects.
       <envar>DLINKFLAGSUFFIX</envar>
     </term>
     <listitem><para>
-DLINKFLAGSUFFIX.
+Suffix added to each element of &cv-link-DLINKFLAGS;.
 </para>
 </listitem>
   </varlistentry>
@@ -1626,7 +1653,7 @@ for <literal>saxon</literal> and <literal>saxon-xslt</literal>, respectively.
       <envar>DRPATHPREFIX</envar>
     </term>
     <listitem><para>
-DRPATHPREFIX.
+Prefix added to rpath entries when generating shared objects.
 </para>
 </listitem>
   </varlistentry>
@@ -1635,7 +1662,7 @@ DRPATHPREFIX.
       <envar>DRPATHSUFFIX</envar>
     </term>
     <listitem><para>
-DRPATHSUFFIX.
+Suffix added to rpath entries when generating shared objects.
 </para>
 </listitem>
   </varlistentry>
@@ -1655,7 +1682,7 @@ The default list is <literal>['.d']</literal>.
       <envar>DVERPREFIX</envar>
     </term>
     <listitem><para>
-DVERPREFIX.
+Prefix added to each element of &cv-link-DVERSIONS;.
 </para>
 </listitem>
   </varlistentry>
@@ -1673,7 +1700,7 @@ List of version tags to enable when compiling.
       <envar>DVERSUFFIX</envar>
     </term>
     <listitem><para>
-DVERSUFFIX.
+Suffix added to each element of &cv-link-DVERSIONS;.
 </para>
 </listitem>
   </varlistentry>
@@ -3333,97 +3360,54 @@ determine the version of versioned import library.
       <envar>IMPLICIT_COMMAND_DEPENDENCIES</envar>
     </term>
     <listitem><para>
-Controls whether or not &SCons; will
-add implicit dependencies for the commands
-executed to build targets.
+Controls how &SCons; adds implicit dependencies from action strings
+(the commands executed to build targets).
+These implicit dependencies allow &SCons; to trigger target rebuilds
+when the compilers, tools, or scripts that affect build outcomes change
+(for example, when a new version of a compiler is installed).
+By default, &SCons; adds an implicit dependency on the executable
+represented by the first argument of the command line.
+This executable is first checked as a path;
+if not found, it is searched for in the execution environment's search path
+(<literal>env['ENV']['PATH']</literal>).
 </para>
 
 <para>
-By default, &SCons; will add to each target
-an implicit dependency on the command
-represented by the first argument of any
-command line it executes (which is typically
-the command itself). By setting such
-a dependency, &SCons; can determine that
-a target should be rebuilt if the command changes,
-such as when a compiler is upgraded to a new version.
-The specific file for the dependency is
-found by searching the
-<varname>PATH</varname>
-variable in the
-<varname>ENV</varname> dictionary
-in the &consenv; used to execute the command.
-The default is the same as
-setting the &consvar;
+If &cv-IMPLICIT_COMMAND_DEPENDENCIES; is set to a falsy value
+(<literal>"none"</literal>, <literal>"false"</literal>,
+<literal>"no"</literal>, <literal>"off"</literal>,
+<literal>"0"</literal> or integer <literal>0</literal>),
+no implicit dependencies from action strings are added.
+If set to an integer value greater than <literal>1</literal>,
+or to <literal>"all"</literal>,
+additional command-line arguments are checked.
+A numeric value <emphasis>N</emphasis>
+checks the first <emphasis>N</emphasis> arguments,
+while <literal>"all"</literal> checks every argument.
+A checked argument beyond the first is added as a dependency
+if it is an absolute path or it refers to
+an existing file in the filesystem;
+unlike the first argument, these additional arguments are not searched
+using the execution environment's search path.
+All other values of &cv-IMPLICIT_COMMAND_DEPENDENCIES;
+are treated the same as the default.
+The value of
 &cv-IMPLICIT_COMMAND_DEPENDENCIES;
-to a True-like value (<quote>true</quote>,
-<quote>yes</quote>,
-or <quote>1</quote> - but not a number
-greater than one, as that has a different meaning).
+is subject to substitution before it is used,
+so it can contain a &consvar; reference.
 </para>
 
 <para>
-Action strings can be segmented by the
-use of an AND operator, <literal>&amp;&amp;</literal>.
-In a segmented string, each segment is a separate
-<quote>command line</quote>, these are run
-sequentially until one fails, or the entire
-sequence has been executed. If an
-action string is segmented, then the selected
-behavior of &cv-IMPLICIT_COMMAND_DEPENDENCIES;
-is applied to each segment.
+Action strings may be segmented with a logical AND operator
+(<literal>&amp;&amp;</literal>),
+indicating each segment is executed sequentially,
+but only if the previous segment succeeded.
+If &cv-IMPLICIT_COMMAND_DEPENDENCIES; is set to
+<literal>"all"</literal> or an integer greater than <literal>1</literal>,
+each segment is treated as a separate command line
+for computing dependencies;
+otherwise, only the first segment is checked.
 </para>
-
-<para>
-If &cv-IMPLICIT_COMMAND_DEPENDENCIES;
-is set to a False-like value
-(<quote>none</quote>,
-<quote>false</quote>,
-<quote>no</quote>,
-<quote>0</quote>,
-etc.),
-then the implicit dependency will
-not be added to the targets
-built with that &consenv;.
-</para>
-
-<para>
-If &cv-IMPLICIT_COMMAND_DEPENDENCIES;
-is set to <quote>2</quote> or higher,
-then that number of arguments in the command line
-will be scanned for relative or absolute paths.
-If any are present, they will be added as
-implicit dependencies to the targets built
-with that &consenv;.
-The first argument in the command line will be
-searched for using the <varname>PATH</varname>
-variable in the <varname>ENV</varname> dictionary
-in the &consenv; used to execute the command.
-The other arguments will only be found if they
-are absolute paths or valid paths relative
-to the working directory.
-</para>
-
-<para>
-If &cv-IMPLICIT_COMMAND_DEPENDENCIES;
-is set to <quote>all</quote>,
-then all arguments in the command line will be
-scanned for relative or absolute paths.
-If any are present, they will be added as
-implicit dependencies to the targets built
-with that &consenv;.
-The first argument in the command line will be
-searched for using the <varname>PATH</varname>
-variable in the <varname>ENV</varname> dictionary
-in the &consenv; used to execute the command.
-The other arguments will only be found if they
-are absolute paths or valid paths relative
-to the working directory.
-</para>
-
-<example_commands>
-env = Environment(IMPLICIT_COMMAND_DEPENDENCIES=False)
-</example_commands>
 </listitem>
   </varlistentry>
   <varlistentry id="cv-INCPREFIX">
@@ -4030,8 +4014,9 @@ General user options passed to the linker for building loadable modules.
       <envar>LDMODULENOVERSIONSYMLINKS</envar>
     </term>
     <listitem><para>
-Instructs the &b-link-LoadableModule; builder to not automatically create symlinks
-for versioned modules. Defaults to <literal>$SHLIBNOVERSIONSYMLINKS</literal>
+Instructs the &b-link-LoadableModule; builder
+not to automatically create symlinks for versioned modules.
+Defaults to &cv-link-SHLIBNOVERSIONSYMLINKS;.
 </para>
 </listitem>
   </varlistentry>
@@ -4052,8 +4037,10 @@ the same as &cv-link-SHLIBPREFIX;.
       <envar>_LDMODULESONAME</envar>
     </term>
     <listitem><para>
-A macro that automatically generates loadable module's SONAME based on $TARGET,
-$LDMODULEVERSION and $LDMODULESUFFIX. Used by &b-link-LoadableModule; builder
+A macro that automatically generates a loadable module's &cv-link-SONAME;
+based on <literal>$TARGET</literal>,
+&cv-link-LDMODULEVERSION; and &cv-link-LDMODULESUFFIX;.
+Used by the &b-link-LoadableModule; builder
 when the linker tool supports SONAME (e.g. &t-link-gnulink;).
 </para>
 </listitem>
@@ -4076,11 +4063,11 @@ the same as $SHLIBSUFFIX.
     </term>
     <listitem><para>
 When this &consvar; is defined, a versioned loadable module
-is created by &b-link-LoadableModule; builder. This activates the
+is created by the &b-link-LoadableModule; builder. This activates the
 &cv-link-_LDMODULEVERSIONFLAGS; and thus modifies the &cv-link-LDMODULECOM; as
 required, adds the version number to the library name, and creates the symlinks
-that are needed. &cv-link-LDMODULEVERSION; versions should exist in the same
-format as &cv-link-SHLIBVERSION;.
+that are needed. &cv-link-LDMODULEVERSION; versions should be
+specified in the same format as &cv-link-SHLIBVERSION;.
 </para>
 </listitem>
   </varlistentry>
@@ -4090,11 +4077,12 @@ format as &cv-link-SHLIBVERSION;.
     </term>
     <listitem><para>
 This macro automatically introduces extra flags to &cv-link-LDMODULECOM; when
-building versioned &b-link-LoadableModule; (that is when
-&cv-link-LDMODULEVERSION; is set). <literal>_LDMODULEVERSIONFLAGS</literal>
+building a versioned &b-link-LoadableModule;
+(that is, when &cv-link-LDMODULEVERSION; is set).
+&cv-_LDMODULEVERSIONFLAGS;
 usually adds &cv-link-SHLIBVERSIONFLAGS; and some extra dynamically generated
-options (such as <literal>-Wl,-soname=$_LDMODULESONAME</literal>).  It is unused
-by plain (unversioned) loadable modules.
+options (such as <literal>-Wl,-soname=$_LDMODULESONAME</literal>).
+It is unused by plain (unversioned) loadable modules.
 </para>
 </listitem>
   </varlistentry>
@@ -4104,8 +4092,8 @@ by plain (unversioned) loadable modules.
     </term>
     <listitem><para>
 Extra flags added to &cv-link-LDMODULECOM; when building versioned
-&b-link-LoadableModule;. These flags are only used when &cv-link-LDMODULEVERSION; is
-set.
+&b-link-LoadableModule;.
+These flags are only used when &cv-link-LDMODULEVERSION; is set.
 </para>
 </listitem>
   </varlistentry>
@@ -4196,7 +4184,9 @@ by &SCons; in all situations. Consider using
       <envar>LEXUNISTD</envar>
     </term>
     <listitem><para>
-Used only in Windows environments to set a lex flag to prevent 'unistd.h' from being included. The default value is '--nounistd'.
+Used only in Windows environments to set a lex flag to prevent
+<literal>unistd.h</literal> from being included.
+The default value is <option>--nounistd</option>.
 </para>
 </listitem>
   </varlistentry>
@@ -4341,7 +4331,7 @@ The list of directories that will be searched for libraries
 specified by the &cv-link-LIBS; &consvar;.
 &cv-LIBPATH; should be a list of path strings,
 or a single string, not a pathname list joined by
-Python's <systemitem>os.pathsep</systemitem>.
+the &Python; <systemitem>os.pathsep</systemitem> character.
 <!-- XXX OLD
 The implicit dependency scanner will search these
 directories for include files. Don't explicitly put include directory
@@ -7294,32 +7284,36 @@ See &t-link-msgmerge; tool and &b-link-POUpdate; builder.
       <envar>PRINT_CMD_LINE_FUNC</envar>
     </term>
     <listitem><para>
-A Python function used to print the command lines as they are executed
-(assuming command printing is not disabled by the
-<option>-q</option>
+The function to print command lines as they are executed.
+Called unless command printing is disabled by the
+<link linkend="opt-question"><option>-q</option>/<option>--question</option></link>
 or
-<option>-s</option>
-options or their equivalents).
-The function must accept four arguments:
+<link linkend="opt-silent"><option>-s</option>/<option>--silent</option></link>
+options.
+The function will be called with four arguments:
 <varname>s</varname>,
 <varname>target</varname>,
 <varname>source</varname> and
 <varname>env</varname>.
 <varname>s</varname>
-is a string showing the command being executed,
+is the command line string to be executed,
 <varname>target</varname>,
-is the target being built (file node, list, or string name(s)),
+is the target(s) being built
 <varname>source</varname>,
-is the source(s) used (file node, list, or string name(s)),
+is the source(s) used
 and <varname>env</varname>
 is the environment being used.
 </para>
 
 <para>
-The function must do the printing itself.
-The default implementation,
-used if this variable is not set or is <constant>None</constant>,
-is to just print the string, as in:
+Any or all of the arguments can be used in composing the message.
+<varname>source</varname> and
+<varname>target</varname> will be lists of nodes,
+and need to be suitably converted for printing (see example).
+The default,
+used if the variable is not set or set to <constant>None</constant>,
+is to print only the string <parameter>s</parameter>,
+equivalent to:
 </para>
 <example_commands>
 def print_cmd_line(s, target, source, env):
@@ -7327,7 +7321,8 @@ def print_cmd_line(s, target, source, env):
 </example_commands>
 
 <para>
-Here is an example of a more interesting function:
+This example uses the source and target
+parameters to format a custom message:
 </para>
 
 <example_commands>
@@ -7358,7 +7353,9 @@ scons: done building targets.
 </screen>
 
 <para>
-Another example could be a function that logs the actual commands to a file.
+Another possible use for a print function is to show
+a very brief message on the console while logging
+the full command line to a file.
 </para>
 </listitem>
   </varlistentry>
@@ -7427,370 +7424,6 @@ The prefix used for PostScript file names.
     </term>
     <listitem><para>
 The prefix used for PostScript file names.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_AUTOSCAN">
-    <term>
-      <envar>QT3_AUTOSCAN</envar>
-    </term>
-    <listitem><para>
-Turn off scanning for mocable files. Use the &b-link-Moc; Builder to explicitly
-specify files to run <command>moc</command> on.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_AUTOSCAN.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_BINPATH">
-    <term>
-      <envar>QT3_BINPATH</envar>
-    </term>
-    <listitem><para>
-The path where the Qt binaries are installed.
-The default value is '&cv-link-QT3DIR;<filename>/bin</filename>'.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_BINPATH.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_CPPPATH">
-    <term>
-      <envar>QT3_CPPPATH</envar>
-    </term>
-    <listitem><para>
-The path where the Qt header files are installed.
-The default value is '&cv-link-QT3DIR;/include'.
-Note: If you set this variable to <constant>None</constant>,
-the tool won't change the &cv-link-CPPPATH;
-construction variable.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_CPPPATH.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_DEBUG">
-    <term>
-      <envar>QT3_DEBUG</envar>
-    </term>
-    <listitem><para>
-Prints lots of debugging information while scanning for moc files.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_DEBUG.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_LIB">
-    <term>
-      <envar>QT3_LIB</envar>
-    </term>
-    <listitem><para>
-Default value is <literal>'qt'</literal>.
-You may want to set this to <literal>'qt-mt'</literal>.
-Note: If you set this variable to <constant>None</constant>,
-the tool won't change the &cv-link-LIBS; variable.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_LIB.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_LIBPATH">
-    <term>
-      <envar>QT3_LIBPATH</envar>
-    </term>
-    <listitem><para>
-The path where the Qt libraries are installed.
-The default value is '&cv-link-QT3DIR;<filename>/lib</filename>'.
-Note: If you set this variable to <constant>None</constant>,
-the tool won't change the &cv-link-LIBPATH;
-construction variable.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_LIBPATH.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_MOC">
-    <term>
-      <envar>QT3_MOC</envar>
-    </term>
-    <listitem><para>
-Default value is '&cv-link-QT3_BINPATH;<filename>/moc</filename>'.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_MOCCXXPREFIX">
-    <term>
-      <envar>QT3_MOCCXXPREFIX</envar>
-    </term>
-    <listitem><para>
-Default value is <literal>''</literal>.
-Prefix for <command>moc</command> output files when source is a C++ file.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_MOCCXXSUFFIX">
-    <term>
-      <envar>QT3_MOCCXXSUFFIX</envar>
-    </term>
-    <listitem><para>
-Default value is <literal>'.moc'</literal>.
-Suffix for <command>moc</command> output files when source is a C++ file.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_MOCCXXSUFFIX.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_MOCFROMCXXCOM">
-    <term>
-      <envar>QT3_MOCFROMCXXCOM</envar>
-    </term>
-    <listitem><para>
-Command to generate a moc file from a C++ file.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_MOCFROMCXXCOM.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_MOCFROMCXXCOMSTR">
-    <term>
-      <envar>QT3_MOCFROMCXXCOMSTR</envar>
-    </term>
-    <listitem><para>
-The string displayed when generating a moc file from a C++ file.
-If this is not set, then &cv-link-QT3_MOCFROMCXXCOM; (the command line) is displayed.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_MOCFROMCXXCOMSTR.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_MOCFROMCXXFLAGS">
-    <term>
-      <envar>QT3_MOCFROMCXXFLAGS</envar>
-    </term>
-    <listitem><para>
-Default value is <literal>'-i'</literal>.
-These flags are passed to <command>moc</command> when moccing a C++ file.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_MOCFROMCXXFLAGS.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_MOCFROMHCOM">
-    <term>
-      <envar>QT3_MOCFROMHCOM</envar>
-    </term>
-    <listitem><para>
-Command to generate a moc file from a header.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_MOCFROMSHCOM.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_MOCFROMHCOMSTR">
-    <term>
-      <envar>QT3_MOCFROMHCOMSTR</envar>
-    </term>
-    <listitem><para>
-The string displayed when generating a moc file from a C++ file.
-If this is not set, then &cv-link-QT3_MOCFROMHCOM; (the command line) is displayed.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_MOCFROMSHCOMSTR.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_MOCFROMHFLAGS">
-    <term>
-      <envar>QT3_MOCFROMHFLAGS</envar>
-    </term>
-    <listitem><para>
-Default value is <literal>''</literal>. These flags are passed to <command>moc</command>
-when moccing a header file.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_MOCFROMSHFLAGS.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_MOCHPREFIX">
-    <term>
-      <envar>QT3_MOCHPREFIX</envar>
-    </term>
-    <listitem><para>
-Default value is <literal>'moc_'</literal>.
-Prefix for <command>moc</command> output files when source is a header.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_MOCHPREFIX.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_MOCHSUFFIX">
-    <term>
-      <envar>QT3_MOCHSUFFIX</envar>
-    </term>
-    <listitem><para>
-Default value is '&cv-link-CXXFILESUFFIX;'.
-Suffix for moc output files when source is a header.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_MOCHSUFFIX.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_UIC">
-    <term>
-      <envar>QT3_UIC</envar>
-    </term>
-    <listitem><para>
-Default value is '&cv-link-QT3_BINPATH;<filename>/uic</filename>'.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_UIC.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_UICCOM">
-    <term>
-      <envar>QT3_UICCOM</envar>
-    </term>
-    <listitem><para>
-Command to generate header files from <filename>.ui</filename> files.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_UICCOM.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_UICCOMSTR">
-    <term>
-      <envar>QT3_UICCOMSTR</envar>
-    </term>
-    <listitem><para>
-The string displayed when generating header files from <filename>.ui</filename> files.
-If this is not set, then &cv-link-QT3_UICCOM; (the command line) is displayed.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_UICCOMSTR.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_UICDECLFLAGS">
-    <term>
-      <envar>QT3_UICDECLFLAGS</envar>
-    </term>
-    <listitem><para>
-Default value is ''. These flags are passed to <command>uic</command>
-when creating a header file from a <filename>.ui</filename> file.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_UICDECLFLAGS.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_UICDECLPREFIX">
-    <term>
-      <envar>QT3_UICDECLPREFIX</envar>
-    </term>
-    <listitem><para>
-Default value is <literal>''</literal>.
-Prefix for <command>uic</command> generated header files.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_UICDECLPREFIX.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_UICDECLSUFFIX">
-    <term>
-      <envar>QT3_UICDECLSUFFIX</envar>
-    </term>
-    <listitem><para>
-Default value is <literal>'.h'</literal>.
-Suffix for <command>uic</command> generated header files.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_UICDECLSUFFIX.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_UICIMPLFLAGS">
-    <term>
-      <envar>QT3_UICIMPLFLAGS</envar>
-    </term>
-    <listitem><para>
-Default value is <literal>''</literal>.
-These flags are passed to <command>uic</command> when creating a C++
-file from a <filename>.ui</filename> file.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_UICIMPFLAGS.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_UICIMPLPREFIX">
-    <term>
-      <envar>QT3_UICIMPLPREFIX</envar>
-    </term>
-    <listitem><para>
-Default value is <literal>'uic_'</literal>.
-Prefix for uic generated implementation files.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_UICIMPLPREFIX.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_UICIMPLSUFFIX">
-    <term>
-      <envar>QT3_UICIMPLSUFFIX</envar>
-    </term>
-    <listitem><para>
-Default value is '&cv-link-CXXFILESUFFIX;'. Suffix for uic generated implementation
-files.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_UICIMPLSUFFIX.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3_UISUFFIX">
-    <term>
-      <envar>QT3_UISUFFIX</envar>
-    </term>
-    <listitem><para>
-Default value is <literal>'.ui'</literal>.
-Suffix of designer input files.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QT_UISUFFIX.
-</para>
-</listitem>
-  </varlistentry>
-  <varlistentry id="cv-QT3DIR">
-    <term>
-      <envar>QT3DIR</envar>
-    </term>
-    <listitem><para>
-The path to the Qt installation to build against.
-If not already set,
-&t-link-qt3; tool tries to obtain this from
-<varname>os.environ</varname>;
-if not found there, it tries to make a guess.
-</para>
-<para>
-<emphasis>Changed in 4.5.0</emphasis>: renamed from QTDIR.
 </para>
 </listitem>
   </varlistentry>
@@ -8346,8 +7979,7 @@ set.
       <envar>SHDLINK</envar>
     </term>
     <listitem><para>
-The linker to use when creating shared objects for code bases
-include D sources.
+The linker to use when creating shared objects from dlang code.
 See also &cv-link-DLINK; for linking static objects.
 </para>
 </listitem>
@@ -8367,7 +7999,7 @@ See also &cv-link-DLINKCOM; for linking static objects.
       <envar>SHDLINKFLAGS</envar>
     </term>
     <listitem><para>
-The list of flags to use when generating a shared object.
+The flags to use when generating a shared object for the D language.
 See also &cv-link-DLINKFLAGS; for linking static objects.
 </para>
 </listitem>
@@ -8991,8 +8623,10 @@ The prefix used for shared library file names.
       <envar>_SHLIBSONAME</envar>
     </term>
     <listitem><para>
-A macro that automatically generates shared library's SONAME based on $TARGET,
-$SHLIBVERSION and $SHLIBSUFFIX. Used by &b-link-SharedLibrary; builder when
+A macro that automatically generates a shared library's &cv-link-SONAME;
+based on <literal>$TARGET</literal>,
+&cv-link-SHLIBVERSION; and &cv-link-SHLIBSUFFIX;.
+Used by the &b-link-SharedLibrary; builder when
 the linker tool supports SONAME (e.g. &t-link-gnulink;).
 </para>
 </listitem>
@@ -9015,9 +8649,12 @@ When this &consvar; is defined, a versioned shared library
 is created by the &b-link-SharedLibrary; builder. This activates the
 &cv-link-_SHLIBVERSIONFLAGS; and thus modifies the &cv-link-SHLINKCOM; as
 required, adds the version number to the library name, and creates the symlinks
-that are needed.  &cv-link-SHLIBVERSION; versions should exist as alphanumeric,
-decimal-delimited values as defined by the regular expression "\w+[\.\w+]*".
-Example &cv-link-SHLIBVERSION; values include '1', '1.2.3', and '1.2.gitaa412c8b'.
+that are needed.  &cv-link-SHLIBVERSION; versions are specified
+as alphanumeric, decimal-delimited values which can be
+recognized by the regular expression
+<literal>"\w+[\.\w+]*"</literal>
+Example valid &cv-SHLIBVERSION; values include
+'1', '1.2.3', and '1.2.gitaa412c8b'.
 </para>
 </listitem>
   </varlistentry>
@@ -9027,11 +8664,12 @@ Example &cv-link-SHLIBVERSION; values include '1', '1.2.3', and '1.2.gitaa412c8b
     </term>
     <listitem><para>
 This macro automatically introduces extra flags to &cv-link-SHLINKCOM; when
-building versioned &b-link-SharedLibrary; (that is when &cv-link-SHLIBVERSION;
-is set). <literal>_SHLIBVERSIONFLAGS</literal> usually adds &cv-link-SHLIBVERSIONFLAGS;
-and some extra dynamically generated options (such as
-<literal>-Wl,-soname=$_SHLIBSONAME</literal>. It is unused by "plain"
-(unversioned) shared libraries.
+building a versioned &b-link-SharedLibrary;
+(that is, when &cv-link-SHLIBVERSION; is set).
+&cv-_SHLIBVERSIONFLAGS; usually adds &cv-link-SHLIBVERSIONFLAGS;
+and some extra dynamically generated options
+(such as <literal>-Wl,-soname=$_SHLIBSONAME</literal>).
+It is unused by "plain" (unversioned) shared libraries.
 </para>
 </listitem>
   </varlistentry>
@@ -9141,11 +8779,18 @@ The suffix used for shared object file names.
       <envar>SONAME</envar>
     </term>
     <listitem><para>
-Variable used to hard-code SONAME for versioned shared library/loadable module.
+The name of a versioned shared library/loadable module.
+If specified, it is an explicit statement of the name;
+if unspecified, the value is generated.
+&cv-SONAME; and &cv-link-SOVERSION; may not both be specified
+in the same &consenv; or override.
 <example_commands>
+# Will cause libtest.so.2 to exist and be a symlink to libtest.so.0.1.2
 env.SharedLibrary('test', 'test.c', SHLIBVERSION='0.1.2', SONAME='libtest.so.2')
 </example_commands>
-The variable is used, for example, by &t-link-gnulink; linker tool.
+</para>
+<para>
+This variable is used by toolchains that support versioned shared objects.
 </para>
 </listitem>
   </varlistentry>
@@ -9193,17 +8838,18 @@ for more information).
       <envar>SOVERSION</envar>
     </term>
     <listitem><para>
-This will construct the <varname>SONAME</varname> using on the base library name
-(<parameter>test</parameter> in the example below) and use specified <varname>SOVERSION</varname>
-to create <varname>SONAME</varname>.
+Version string used in construction of &cv-link-SONAME;.
+The version is added to the base library name
+(<parameter>test</parameter> in the example below).
+&cv-SONAME; and &cv-SOVERSION; may not both be specified
+in the same &consenv; or override.
 <example_commands>
+# SONAME will be libtest.so.2, and will be a symlink to libtest.so.0.1.2
 env.SharedLibrary('test', 'test.c', SHLIBVERSION='0.1.2', SOVERSION='2')
 </example_commands>
-The variable is used, for example, by &t-link-gnulink; linker tool.
 </para>
 <para>
-In the example above <varname>SONAME</varname> would be <filename>libtest.so.2</filename>
-which would be a symlink and point to <filename>libtest.so.0.1.2</filename>
+This variable is used by toolchains that support versioned shared objects.
 </para>
 </listitem>
   </varlistentry>
@@ -10989,7 +10635,7 @@ Seconds (zero-based)
     </term>
     <listitem><para>
 The command line used to call the zip utility,
-or the internal Python function used to create a
+or the internal &Python; function used to create a
 zip archive.
 </para>
 </listitem>
@@ -11001,10 +10647,9 @@ zip archive.
     <listitem><para>
 The
 <varname>compression</varname>
-flag
-from the Python
-<filename>zipfile</filename>
-module used by the internal Python function
+flag from the &Python;
+<systemitem>zipfile</systemitem>
+module used by the internal &Python; function
 to control whether the zip archive
 is compressed or not.
 The default value is
@@ -11024,7 +10669,7 @@ module is unavailable.
 The string displayed when archiving files
 using the zip utility.
 If this is not set, then &cv-link-ZIPCOM;
-(the command line or internal Python function) is displayed.
+(the command line or internal &Python; function) is displayed.
 </para>
 
 <example_commands>

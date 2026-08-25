@@ -3213,7 +3213,7 @@ not be used in new projects.
 </para>
 
 <para>
-<emphasis>Deprecated since version NEXT_RELEASE</emphasis>:
+<emphasis>Deprecated since version 4.11.0</emphasis>:
 the signature-file-per-directory mode is deprecated
 and will be removed in a future release.
 </para>

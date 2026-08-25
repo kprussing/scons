@@ -2878,7 +2878,7 @@ class Base(SubstitutionEnvironment):
         stored as one file per directory, rather than in a single project-wide
         database.
 
-        .. deprecated:: NEXT_RELEASE
+        .. deprecated:: 4.11.0
            The signature-file-per-directory mode is deprecated.
         """
         if name is not None:

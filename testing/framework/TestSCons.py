@@ -59,7 +59,7 @@ from TestCommon import __all__
 # here provides some independent verification that what we packaged
 # conforms to what we expect.
 
-default_version = '4.10.2ayyyymmdd'
+default_version = '4.12.0ayyyymmdd'
 
 # TODO: these need to be hand-edited when there are changes
 python_version_unsupported = (3, 7, 0)

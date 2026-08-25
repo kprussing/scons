@@ -8,19 +8,19 @@ NOTE: The 4.0.0 release of SCons dropped Python 2.7 support. Use 3.1.2 if
   Python 2.7 support is required (but note old SCons releases are unsupported).
 NOTE: Since SCons 4.3.0, Python 3.6.0 or above is required.
 NOTE: Since SCons 4.9.0, Python 3.7.0 or above is required.
-NOTE: The last release to support Python 3.7 or Python 3.8 is NEXT_RELEASE.
+NOTE: The last release to support Python 3.7 or Python 3.8 is 4.11.0.
 
 RELEASE  VERSION/DATE TO BE FILLED IN LATER
 
-  From John Doe:
-    - Whatever John Doe did.
+  From Mats Wichmann:
+    - Undo, for now, the 4.11.0 change (from PR 4875) to read a
+      saved-Variables file using a File node. There were unanticipated
+      side effects not caught by any existing test. Will be reintroduced
+      when the issues can be resolved cleanly without backwards
+      compatibility concerns.
 
-  From Cornelii Sandberg:
-    - Fix Variables() not reading a saved-variables file (e.g. custom.py)
-      from the source directory when building in a separate variant
-      directory. The file is now resolved through the File() node
-      infrastructure, so it is found in the source directory or a
-      repository (issue #816).
+
+RELEASE 4.11.0 - Mon, 10 Aug 2026 21:16:00 -0700
 
   From Joseph Brill:
     - Add possible build failure when targeting 32-bit arm using
@@ -85,6 +85,14 @@ RELEASE  VERSION/DATE TO BE FILLED IN LATER
     - Fix typos in preface, Chapter 6, Chapter 9 and Chapter 10 of User Guide
     - Fix broken links in Chapter 1 of User Guide
 
+  From Dillan Mills:
+    - Fix handling of AddOption for option-arguments with spaces
+      (when omitting the = sign or when an option takes multiple
+      option-arguments). Arguments unknown at the time the first pass
+      splits the command line into arguments and targets would put such
+      arguments into targets, and they remained there even after the
+      AddOption calls were seen. Closes #2748, #2805, #2977.
+
   From Paul Movall:
     - Fix a problem where AlwaysBuild was not honored by ninja
     - Fix --no-exec when using ninja tool
@@ -92,6 +100,18 @@ RELEASE  VERSION/DATE TO BE FILLED IN LATER
   From Keith F. Prussing:
     - Add RequiredPackage to the LaTeX scanner for recursive scanning of
       custom LaTeX packages.
+
+  From Cornelii Sandberg:
+    - Fix Variables() not reading a saved-variables file (e.g. custom.py)
+      from the source directory when building in a separate variant
+      directory. The file is now resolved through the File() node
+      infrastructure, so it is found in the source directory or a
+      repository (issue #816).
+
+  From Vassili Tchersky:
+    - Add 'bsd' platform definition.
+    - The default tool search order now prefers the LLVM/clang toolchain
+      over GCC on FreeBSD and OpenBSD (PR #4887).
 
   From Mats Wichmann:
     - Introduce some unit tests for the file locking utility routines
@@ -137,6 +157,12 @@ RELEASE  VERSION/DATE TO BE FILLED IN LATER
       on a one-time uuid to make a path to the file.
     - Clarify VariantDir behavior when switching to not duplicate sources
       and tweak wording a bit.
+    - Complete the work from PR #3799 on AddOption handling (original work
+      credited to Dillan Mills)
+    - Update documentation of the three file-finding functions in the API
+      (FindFile, FindInstalledFiles, FindSourceFiles) as well as FindPathDirs.
+      Also add a test for FindFile to be sure it locates non-existing
+      derived files as advertised.
     - Don't duplicate the creation of Tool objects if "default" is part of
       the tool list.
     - Test suite: add support for Python 3.15 in the Action unit tests.
@@ -156,6 +182,11 @@ RELEASE  VERSION/DATE TO BE FILLED IN LATER
     - Fixed PDF doc build problems relating to illegal margin widths ("")
       and table column alignment.
     - Handle missing/malformed manifest in mslink more gracefully (issue 4866).
+    - Change the way ldc D compiler specifies including libdruntime when making
+      a shared object. ldc version 1.3 (2017) introduced shared druntime on some
+      platforms, with an odd library naming scheme. SCons specification was
+      "too precise" to work cross-platform with the new scheme, let the linker
+      pass pick.
     - Reference manual improvements:
       * More clarifications in Builder Methods section.
       * Clarify VariantDir behavior when switching from duplicate=True (the

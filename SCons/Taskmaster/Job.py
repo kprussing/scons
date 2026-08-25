@@ -78,7 +78,7 @@ class Jobs:
         requested and the scheduler selected - the old scheduler is
         available through CLI ``--experimental=legacy_sched_deprecated``.
 
-        .. versionchanged: NEXT_RELEASE
+        .. versionchanged: 4.11.0
            Legacy scheduler deprecated, flag renamed to ``legacy_sched_deprecated``
         """
         # Importing GetOption here instead of at top of file to avoid

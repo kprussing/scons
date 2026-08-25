@@ -30,10 +30,35 @@ In other words, if a build has a directory as a source file, any
 change in any file under that directory should trigger a rebuild.
 """
 
+import time
+
 import TestSCons
 
 
 test = TestSCons.TestSCons()
+
+# The 'tstamp' and 'cmd-tstamp' targets use the 'timestamp-newer' Decider,
+# which rebuilds only when a source is *strictly* newer than the target.
+# SCons compares mtimes at whole-second granularity (stat.ST_MTIME), so a
+# source written in the same integer second as the target it should
+# invalidate is not seen as newer, and the expected rebuild is skipped.
+# This is timing-sensitive and shows up intermittently under load (e.g.
+# 'runtest.py --jobs=0').  To make the timestamp-decider checks reliable,
+# write those sources with an explicitly advanced mtime instead of relying
+# on wall-clock timing.  Content-decider targets are immune and need no help.
+_next_mtime = [0.0]
+
+
+def write_newer(path, content) -> None:
+    """Write a source file and stamp it with a strictly-newer mtime.
+
+    The mtime is advanced past both our own monotonic clock and the real
+    wall clock, so it stays newer than any target rebuilt in between (a
+    rebuild stamps the target with the real current time).
+    """
+    test.write(path, content)
+    _next_mtime[0] = max(_next_mtime[0], time.time()) + 2
+    test.touch(path, mtime=_next_mtime[0])
 
 test.subdir('tstamp', [ 'tstamp', 'subdir' ],
             'content', [ 'content', 'subdir' ],
@@ -109,12 +134,10 @@ test.up_to_date(arguments='cmd-content.out')
 test.up_to_date(arguments='cmd-tstamp-noscan.out')
 test.up_to_date(arguments='cmd-content-noscan.out')
 
-test.sleep()  # delay for timestamps
-
-test.write(['tstamp', 'foo.txt'], 'foo.txt 2\n')
+write_newer(['tstamp', 'foo.txt'], 'foo.txt 2\n')
 test.not_up_to_date(arguments='tstamp.out')
 
-test.write(['tstamp', 'new.txt'], 'new.txt\n')
+write_newer(['tstamp', 'new.txt'], 'new.txt\n')
 test.not_up_to_date(arguments='tstamp.out')
 
 test.write(['content', 'foo.txt'], 'foo.txt 2\n')
@@ -123,11 +146,11 @@ test.not_up_to_date(arguments='content.out')
 test.write(['content', 'new.txt'], 'new.txt\n')
 test.not_up_to_date(arguments='content.out')
 
-test.write(['cmd-tstamp', 'foo.txt'], 'foo.txt 2\n')
+write_newer(['cmd-tstamp', 'foo.txt'], 'foo.txt 2\n')
 test.not_up_to_date(arguments='cmd-tstamp.out')
 test.up_to_date(arguments='cmd-tstamp-noscan.out')
 
-test.write(['cmd-tstamp', 'new.txt'], 'new.txt\n')
+write_newer(['cmd-tstamp', 'new.txt'], 'new.txt\n')
 test.not_up_to_date(arguments='cmd-tstamp.out')
 test.up_to_date(arguments='cmd-tstamp-noscan.out')
 
@@ -139,10 +162,10 @@ test.write(['cmd-content', 'new.txt'], 'new.txt\n')
 test.not_up_to_date(arguments='cmd-content.out')
 test.up_to_date(arguments='cmd-content-noscan.out')
 
-test.write(['tstamp', 'subdir', 'bar.txt'], 'bar.txt 2\n')
+write_newer(['tstamp', 'subdir', 'bar.txt'], 'bar.txt 2\n')
 test.not_up_to_date(arguments='tstamp.out')
 
-test.write(['tstamp', 'subdir', 'new.txt'], 'new.txt\n')
+write_newer(['tstamp', 'subdir', 'new.txt'], 'new.txt\n')
 test.not_up_to_date(arguments='tstamp.out')
 
 test.write(['content', 'subdir', 'bar.txt'], 'bar.txt 2\n')
@@ -151,11 +174,11 @@ test.not_up_to_date(arguments='content.out')
 test.write(['content', 'subdir', 'new.txt'], 'new.txt\n')
 test.not_up_to_date(arguments='content.out')
 
-test.write(['cmd-tstamp', 'subdir', 'bar.txt'], 'bar.txt 2\n')
+write_newer(['cmd-tstamp', 'subdir', 'bar.txt'], 'bar.txt 2\n')
 test.not_up_to_date(arguments='cmd-tstamp.out')
 test.up_to_date(arguments='cmd-tstamp-noscan.out')
 
-test.write(['cmd-tstamp', 'subdir', 'new.txt'], 'new.txt\n')
+write_newer(['cmd-tstamp', 'subdir', 'new.txt'], 'new.txt\n')
 test.not_up_to_date(arguments='cmd-tstamp.out')
 test.up_to_date(arguments='cmd-tstamp-noscan.out')
 
@@ -167,7 +190,7 @@ test.write(['cmd-content', 'subdir', 'new.txt'], 'new.txt\n')
 test.not_up_to_date(arguments='cmd-content.out')
 test.up_to_date(arguments='cmd-content-noscan.out')
 
-test.write('junk.txt', 'junk.txt 2\n')
+write_newer('junk.txt', 'junk.txt 2\n')
 test.not_up_to_date(arguments='tstamp.out')
 test.not_up_to_date(arguments='content.out')
 
