@@ -12,9 +12,12 @@ NOTE: The last release to support Python 3.7 or Python 3.8 is 4.11.0.
 
 RELEASE  VERSION/DATE TO BE FILLED IN LATER
 
-      From John Doe:
-
-        - Whatever John Doe did.
+  From Mats Wichmann:
+    - Undo, for now, the 4.11.0 change (from PR 4875) to read a
+      saved-Variables file using a File node. There were unanticipated
+      side effects not caught by any existing test. Will be reintroduced
+      when the issues can be resolved cleanly without backwards
+      compatibility concerns.
 
 
 RELEASE 4.11.0 - Mon, 10 Aug 2026 21:16:00 -0700
