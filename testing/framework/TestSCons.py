@@ -59,10 +59,10 @@ from TestCommon import __all__
 # here provides some independent verification that what we packaged
 # conforms to what we expect.
 
-default_version = '4.12.0ayyyymmdd'
+default_version = '4.11.2ayyyymmdd'
 
 # TODO: these need to be hand-edited when there are changes
-python_version_unsupported = (3, 7, 0)
+python_version_unsupported = (3, 9, 0)
 python_version_deprecated = (3, 9, 0)
 python_version_supported_str = "3.9.0"  # str of lowest non-deprecated Python
 
