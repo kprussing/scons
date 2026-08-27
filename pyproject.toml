@@ -137,4 +137,13 @@ exclude = [
     "^SCons/Tool/docbook/docbook-xsl-1.76.1/",
 ]
 
+[tool.ty.environment]
+python-version = "3.9"
+python-platform = "all"
+extra-paths = ["./testing/framework"]
+
+[tool.ty.rules]
+blanket-ignore-comment = "warn"
+missing-type-argument = "warn"
+
 # TODO: need a matching section for pyright? (doesn't read [tool.mypy]
