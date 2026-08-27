@@ -10,6 +10,13 @@ NOTE: Since SCons 4.3.0, Python 3.6.0 or above is required.
 NOTE: Since SCons 4.9.0, Python 3.7.0 or above is required.
 NOTE: The last release to support Python 3.7 or Python 3.8 is 4.11.1
 
+RELEASE  VERSION/DATE TO BE FILLED IN LATER
+
+      From John Doe:
+
+        - Whatever John Doe did.
+
+
 RELEASE 4.11.1 - Mon, 26 Aug 2026 21:16:00 -0700
 
   From Mats Wichmann:
