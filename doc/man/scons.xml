@@ -87,7 +87,7 @@ and a database of information about previous builds so
 details do not have to be recalculated each run.
 </para>
 
-<para>&scons; requires &Python; 3.7 or later to run;
+<para>&scons; requires &Python; 3.9 or later to run;
 there should be no other dependencies or requirements,
 unless the experimental Ninja tool is used (requires the ninja package).
 </para>

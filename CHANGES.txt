@@ -12,9 +12,8 @@ NOTE: The last release to support Python 3.7 or Python 3.8 is 4.11.1
 
 RELEASE  VERSION/DATE TO BE FILLED IN LATER
 
-      From John Doe:
-
-        - Whatever John Doe did.
+  From Thaddeus Crews:
+    - Removed Python 3.7 & 3.8 support.
 
 
 RELEASE 4.11.1 - Mon, 26 Aug 2026 21:16:00 -0700
