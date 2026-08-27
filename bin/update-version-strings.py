@@ -31,7 +31,7 @@ import re
 NEXT_PLACEHOLDER = 'NEXT_RELEASE'
 PREV_PLACEHOLDER = 'PREVIOUS_RELEASE'
 
-SKIP_DIRS = ('__pycache__', 'node_modules', 'template', 'build')
+SKIP_DIRS = ('__pycache__', 'node_modules', 'template', 'build', 'bin')
 
 
 def update_file(file_path, next_version, prev_version, dry_run=False):
