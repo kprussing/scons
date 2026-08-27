@@ -101,6 +101,7 @@ RELEASE 4.11.0 - Mon, 10 Aug 2026 21:16:00 -0700
       AddOption calls were seen. Closes #2748, #2805, #2977.
 
   From Paul Movall:
+    - Fix a problem where AlwaysBuild was not honored by ninja
     - Fix --no-exec when using ninja tool
 
   From Keith F. Prussing:

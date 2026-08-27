@@ -39,7 +39,15 @@ CHANGED/ENHANCED EXISTING FUNCTIONALITY
 FIXES
 -----
 
-- List fixes of outright bugs
+- Revert the change to the internal implementation of reading a
+  saved-Variables file. This also undoes the minor API change made when
+  the change was introduced in SCons 4.11.0: in that release is was
+  possible to use a top-relative path in the Variables() call when giving
+  the name of a file (that is, a path that begins with #). This is once
+  again disallowed. The plan is to reintroduce this change in a future
+  release, once the issues are fully resolved.
+
+- Fix ninja to honor AlwaysBuild on a target
 
 IMPROVEMENTS
 ------------
