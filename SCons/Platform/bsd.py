@@ -1,4 +1,3 @@
-#
 # MIT License
 #
 # Copyright The SCons Foundation
@@ -22,18 +21,15 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""
-This is a fake tool to instruct any builds still referencing 'qt' instead
-of the new 'qt3' or a newer QT builder how to fix their now broken build.
-"""
-import SCons.Errors
+"""Platform-specific initialisation for BSD flavours whose base system
+ships an LLVM toolchain.
 
-def generate(env):
-    raise SCons.Errors.UserError(
-        "Deprecated tool 'qt' renamed to 'qt3'. "
-        "Please update your build accordingly. "
-        "'qt3' will be removed entirely in a future release."
-    )
+There normally shouldn't be any need to import this module directly.  It
+will usually be imported through the generic SCons.Platform.Platform()
+selection method.
+"""
 
-def exists(env) -> bool:
-    return False
+from . import posix
+
+def generate(env) -> None:
+    posix.generate(env)

@@ -43,13 +43,13 @@ import os
 import sys
 import types
 import unittest
-from unittest import mock
 from subprocess import PIPE
 from typing import TYPE_CHECKING
+from unittest import mock
 
 # If assertEqual truncates strings so it's hard to see the diff, enable this:
-# if 'unittest.util' in __import__('sys').modules:
-#     __import__('sys').modules['unittest.util']._MAX_LENGTH = 99999999
+if 'unittest.util' in __import__('sys').modules:
+    __import__('sys').modules['unittest.util']._MAX_LENGTH = 99999999
 
 import SCons.Action
 import SCons.Environment
@@ -154,13 +154,17 @@ class Environment:
             self.d[k] = v
 
     # Just use the underlying scons_subst*() utility methods.
-    def subst(self, strSubst, raw: int=0, target=[], source=[], conv=None, overrides: bool=False):
+    def subst(self, strSubst, raw: int=0, target=[], source=[], conv=None, overrides: dict | None = None):
+        if overrides is None:
+            overrides = {}
         return SCons.Subst.scons_subst(strSubst, self, raw,
                                        target, source, self.d, conv=conv, overrides=overrides)
 
     subst_target_source = subst
 
-    def subst_list(self, strSubst, raw: int=0, target=[], source=[], conv=None, overrides: bool=False):
+    def subst_list(self, strSubst, raw: int=0, target=[], source=[], conv=None, overrides: dict | None = None):
+        if overrides is None:
+            overrides = {}
         return SCons.Subst.scons_subst_list(strSubst, self, raw,
                                             target, source, self.d, conv=conv, overrides=overrides)
 
@@ -1549,14 +1553,13 @@ class CommandGeneratorActionTestCase(unittest.TestCase):
 
         # Since the python bytecode has per version differences, we need different expected results per version
         func_matches = {
-            (3, 7): bytearray(b'0, 0, 0, 0,(),(),(d\x00S\x00),(),()'),
-            (3, 8): bytearray(b'0, 0, 0, 0,(),(),(d\x00S\x00),(),()'),
             (3, 9): bytearray(b'0, 0, 0, 0,(),(),(d\x00S\x00),(),()'),
             (3, 10): bytearray(b'0, 0, 0, 0,(),(),(d\x00S\x00),(),()'),
             (3, 11): bytearray(b'0, 0, 0, 0,(),(),(\x97\x00d\x00S\x00),(),()'),
             (3, 12): bytearray(b'0, 0, 0, 0,(),(),(\x97\x00y\x00),(),()'),
             (3, 13): bytearray(b'0, 0, 0, 0,(),(),(\x95\x00g\x00),(),()'),
             (3, 14): bytearray(b'0, 0, 0, 0,(),(),(\x80\x00R\x00#\x00),(),()'),
+            (3, 15): bytearray(b'0, 0, 0, 0,(),(),(\x80\x00\x00\x00P\x07!\x00),(),()'),
         }
 
         meth_matches = [
@@ -1730,26 +1733,25 @@ class FunctionActionTestCase(unittest.TestCase):
             pass
 
         func_matches = {
-            (3, 7): bytearray(b'0, 0, 0, 0,(),(),(d\x00S\x00),(),()'),
-            (3, 8): bytearray(b'0, 0, 0, 0,(),(),(d\x00S\x00),(),()'),
             (3, 9): bytearray(b'0, 0, 0, 0,(),(),(d\x00S\x00),(),()'),
             (3, 10): bytearray(b'0, 0, 0, 0,(),(),(d\x00S\x00),(),()'),
             (3, 11): bytearray(b'0, 0, 0, 0,(),(),(\x97\x00d\x00S\x00),(),()'),
             (3, 12): bytearray(b'0, 0, 0, 0,(),(),(\x97\x00y\x00),(),()'),
             (3, 13): bytearray(b'0, 0, 0, 0,(),(),(\x95\x00g\x00),(),()'),
             (3, 14): bytearray(b'0, 0, 0, 0,(),(),(\x80\x00R\x00#\x00),(),()'),
+            (3, 15): bytearray(b'0, 0, 0, 0,(),(),(\x80\x00\x00\x00P\x07!\x00),(),()'),
 
         }
 
         meth_matches = {
-            (3, 7): bytearray(b'1, 1, 0, 0,(),(),(d\x00S\x00),(),()'),
-            (3, 8): bytearray(b'1, 1, 0, 0,(),(),(d\x00S\x00),(),()'),
             (3, 9): bytearray(b'1, 1, 0, 0,(),(),(d\x00S\x00),(),()'),
             (3, 10): bytearray(b'1, 1, 0, 0,(),(),(d\x00S\x00),(),()'),
             (3, 11): bytearray(b'1, 1, 0, 0,(),(),(\x97\x00d\x00S\x00),(),()'),
             (3, 12): bytearray(b'1, 1, 0, 0,(),(),(\x97\x00y\x00),(),()'),
             (3, 13): bytearray(b'1, 1, 0, 0,(),(),(\x95\x00g\x00),(),()'),
             (3, 14): bytearray(b'1, 1, 0, 0,(),(),(\x80\x00R\x00#\x00),(),()'),
+            (3, 15): bytearray(b'1, 1, 0, 0,(),(),(\x80\x00\x00\x00P\x07!\x00),(),()'),
+
         }
 
         def factory(act, **kw):
@@ -1983,14 +1985,13 @@ class LazyActionTestCase(unittest.TestCase):
             pass
 
         func_matches = {
-            (3, 7): bytearray(b'0, 0, 0, 0,(),(),(d\x00S\x00),(),()'),
-            (3, 8): bytearray(b'0, 0, 0, 0,(),(),(d\x00S\x00),(),()'),
             (3, 9): bytearray(b'0, 0, 0, 0,(),(),(d\x00S\x00),(),()'),
             (3, 10): bytearray(b'0, 0, 0, 0,(),(),(d\x00S\x00),(),()'),
             (3, 11): bytearray(b'0, 0, 0, 0,(),(),(\x97\x00d\x00S\x00),(),()'),
             (3, 12): bytearray(b'0, 0, 0, 0,(),(),(\x97\x00y\x00),(),()'),
             (3, 13): bytearray(b'0, 0, 0, 0,(),(),(\x95\x00g\x00),(),()'),
             (3, 14): bytearray(b'0, 0, 0, 0,(),(),(\x80\x00R\x00#\x00),(),()'),
+            (3, 15): bytearray(b'0, 0, 0, 0,(),(),(\x80\x00\x00\x00P\x07!\x00),(),()'),
         }
 
         meth_matches = [
@@ -2046,14 +2047,13 @@ class ActionCallerTestCase(unittest.TestCase):
             pass
 
         matches = {
-            (3, 7): b'd\x00S\x00',
-            (3, 8): b'd\x00S\x00',
             (3, 9): b'd\x00S\x00',
             (3, 10): b'd\x00S\x00',
             (3, 11): b'\x97\x00d\x00S\x00',
             (3, 12): b'\x97\x00y\x00',
             (3, 13): b'\x95\x00g\x00',
             (3, 14): b'\x80\x00R\x00#\x00',
+            (3, 15): b'\x80\x00\x00\x00P\x07!\x00',
         }
 
         with self.subTest():
@@ -2249,8 +2249,6 @@ class ObjectContentsTestCase(unittest.TestCase):
         # we need different expected results per version
         # Note unlike the others, this result is a tuple, use assertIn
         expected = {
-            (3, 7): (bytearray(b"3, 3, 0, 0,(),(),(|\x00S\x00),(),()"),),
-            (3, 8): (bytearray(b"3, 3, 0, 0,(),(),(|\x00S\x00),(),()"),),
             (3, 9): (bytearray(b"3, 3, 0, 0,(),(),(|\x00S\x00),(),()"),),
             (3, 10): (  # 3.10.1, 3.10.2
                 bytearray(b"3, 3, 0, 0,(N.),(),(|\x00S\x00),(),()"),
@@ -2260,6 +2258,7 @@ class ObjectContentsTestCase(unittest.TestCase):
             (3, 12): (bytearray(b"3, 3, 0, 0,(),(),(\x97\x00|\x00S\x00),(),()"),),
             (3, 13): (bytearray(b"3, 3, 0, 0,(),(),(\x95\x00U\x00$\x00),(),()"),),
             (3, 14): (bytearray(b"3, 3, 0, 0,(),(),(\x80\x00V\x00#\x00),(),()"),),
+            (3, 15): bytearray(b'3, 3, 0, 0,(),(),(\x80\x00\x00\x00U\x00!\x00),(),()'),
         }
 
         c = SCons.Action._function_contents(func1)
@@ -2277,12 +2276,6 @@ class ObjectContentsTestCase(unittest.TestCase):
         # Since the python bytecode has per version differences,
         # we need different expected results per version
         expected = {
-            (3, 7): bytearray(
-                b"{TestClass:__main__}[[[(<class 'object'>, ()), [(<class '__main__.TestClass'>, (<class 'object'>,))]]]]{{1, 1, 0, 0,(a,b),(a,b),(d\x01|\x00_\x00d\x02|\x00_\x01d\x00S\x00),(),(),2, 2, 0, 0,(),(),(d\x00S\x00),(),()}}{{{a=a,b=b}}}"
-            ),
-            (3, 8): bytearray(
-                b"{TestClass:__main__}[[[(<class 'object'>, ()), [(<class '__main__.TestClass'>, (<class 'object'>,))]]]]{{1, 1, 0, 0,(a,b),(a,b),(d\x01|\x00_\x00d\x02|\x00_\x01d\x00S\x00),(),(),2, 2, 0, 0,(),(),(d\x00S\x00),(),()}}{{{a=a,b=b}}}"
-            ),
             (3, 9): bytearray(
                 b"{TestClass:__main__}[[[(<class 'object'>, ()), [(<class '__main__.TestClass'>, (<class 'object'>,))]]]]{{1, 1, 0, 0,(a,b),(a,b),(d\x01|\x00_\x00d\x02|\x00_\x01d\x00S\x00),(),(),2, 2, 0, 0,(),(),(d\x00S\x00),(),()}}{{{a=a,b=b}}}"
             ),
@@ -2301,6 +2294,9 @@ class ObjectContentsTestCase(unittest.TestCase):
             (3, 14): bytearray(
                 b"{TestClass:__main__}[[[(<class 'object'>, ()), [(<class '__main__.TestClass'>, (<class 'object'>,))]]]]{{1, 1, 0, 0,(a,b),(a,b),(\x80\x00R\x00V\x00n\x00\x00\x00\x00\x00\x00\x00\x00\x00R\x01V\x00n\x01\x00\x00\x00\x00\x00\x00\x00\x00R\x02#\x00),(),(),2, 2, 0, 0,(),(),(\x80\x00R\x00#\x00),(),()}}{{{a=a,b=b}}}"
             ),
+            (3, 15): bytearray(
+                b"{TestClass:__main__}[[[(<class 'object'>, ()), [(<class '__main__.TestClass'>, (<class 'object'>,))]]]]{{1, 1, 0, 0,(a,b),(a,b),(\x80\x00\x00\x00Q\x00U\x00m\x00\x00\x00\x00\x00\x00\x00\x00\x00Q\x01U\x00m\x01\x00\x00\x00\x00\x00\x00\x00\x00P\x07!\x00),(),(),2, 2, 0, 0,(),(),(\x80\x00\x00\x00P\x07!\x00),(),()}}{{{a=a,b=b}}}"
+            ),
         }
         self.assertEqual(c, expected[sys.version_info[:2]])
 
@@ -2312,12 +2308,6 @@ class ObjectContentsTestCase(unittest.TestCase):
 
         # Since the python bytecode has per version differences, we need different expected results per version
         expected = {
-            (3, 7): bytearray(
-                b"0, 0, 0, 0,(Hello, World!),(print),(e\x00d\x00\x83\x01\x01\x00d\x01S\x00)"
-            ),
-            (3, 8): bytearray(
-                b"0, 0, 0, 0,(Hello, World!),(print),(e\x00d\x00\x83\x01\x01\x00d\x01S\x00)"
-            ),
             (3, 9): bytearray(
                 b"0, 0, 0, 0,(Hello, World!),(print),(e\x00d\x00\x83\x01\x01\x00d\x01S\x00)"
             ),
@@ -2335,6 +2325,9 @@ class ObjectContentsTestCase(unittest.TestCase):
             ),
             (3, 14): bytearray(
                 b"0, 0, 0, 0,(Hello, World!),(print),(\x80\x00]\x00!\x00R\x004\x01\x00\x00\x00\x00\x00\x00\x1f\x00R\x01#\x00)"
+            ),
+            (3, 15): bytearray(
+                b'0, 0, 0, 0,(Hello, World!),(print),(\x80\x00\x00\x00\\\x00\x1f\x00Q\x002\x01\x00\x00\x00\x00\x00\x00\x1d\x00P\x07!\x00)'
             ),
         }
 

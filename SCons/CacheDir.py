@@ -31,10 +31,10 @@ import shutil
 import stat
 import sys
 import tempfile
-import uuid
 
 import SCons.Action
 import SCons.Errors
+# import SCons.Node.FS  # used for hash_chunksice, but causes import loop
 import SCons.Warnings
 import SCons.Util
 
@@ -49,7 +49,6 @@ cache_debug = False
 cache_force = False
 cache_show = False
 cache_readonly = False
-cache_tmp_uuid = uuid.uuid4().hex
 
 def CacheRetrieveFunc(target, source, env) -> int:
     t = target[0]
@@ -110,7 +109,6 @@ def CachePushFunc(target, source, env) -> None:
 
     cd.CacheDebug('CachePush(%s):  pushing to %s\n', t, cachefile)
 
-    tempfile = "%s.tmp%s"%(cachefile,cache_tmp_uuid)
     errfmt = "Unable to copy %s to cache. Cache file is %s"
 
     try:
@@ -119,11 +117,13 @@ def CachePushFunc(target, source, env) -> None:
         msg = errfmt % (str(target), cachefile)
         raise SCons.Errors.SConsEnvironmentError(msg)
     try:
-        if fs.islink(t.get_internal_path()):
-            fs.symlink(fs.readlink(t.get_internal_path()), tempfile)
-        else:
-            cd.copy_to_cache(env, t.get_internal_path(), tempfile)
-        fs.rename(tempfile, cachefile)
+        with tempfile.TemporaryDirectory(dir=cachedir) as temp_dir:
+            temp_file = os.path.join(temp_dir, os.path.basename(cachefile))
+            if fs.islink(t.get_internal_path()):
+                fs.symlink(fs.readlink(t.get_internal_path()), temp_file)
+            else:
+                cd.copy_to_cache(env, t.get_internal_path(), temp_file)
+            fs.rename(temp_file, cachefile)
 
     except OSError:
         # It's possible someone else tried writing the file at the
@@ -210,44 +210,22 @@ class CacheDir:
             return False
 
         try:
-            # TODO: Python 3.7. See comment below.
-            # tempdir = tempfile.TemporaryDirectory(dir=os.path.dirname(directory))
-            tempdir = tempfile.mkdtemp(dir=os.path.dirname(directory))
+            tempdir = tempfile.TemporaryDirectory(dir=os.path.dirname(directory))
         except OSError as e:
             msg = "Failed to create cache directory " + path
             raise SCons.Errors.SConsEnvironmentError(msg) from e
 
-        # TODO: Python 3.7: the context manager raises exception on cleanup
-        #    if the temporary was moved successfully (File Not Found).
-        #    Fixed in 3.8+. In the replacement below we manually clean up if
-        #    the move failed as mkdtemp() does not. TemporaryDirectory's
-        #    cleanup is more sophisitcated so prefer when we can use it.
-        # self._add_config(tempdir.name)
-        # with tempdir:
-        #     try:
-        #         os.replace(tempdir.name, directory)
-        #         return True
-        #     except OSError as e:
-        #         # did someone else get there first?
-        #         if os.path.isdir(directory):
-        #             return False  # context manager cleans up
-        #         msg = "Failed to create cache directory " + path
-        #         raise SCons.Errors.SConsEnvironmentError(msg) from e
-
-        self._add_config(tempdir)
-        try:
-            os.replace(tempdir, directory)
-            return True
-        except OSError as e:
-            # did someone else get there first? attempt cleanup.
-            if os.path.isdir(directory):
-                try:
-                    shutil.rmtree(tempdir)
-                except Exception:  # we tried, don't worry about it
-                    pass
-                return False
-            msg = "Failed to create cache directory " + path
-            raise SCons.Errors.SConsEnvironmentError(msg) from e
+        self._add_config(tempdir.name)
+        with tempdir:
+            try:
+                os.replace(tempdir.name, directory)
+                return True
+            except OSError as e:
+                # did someone else get there first?
+                if os.path.isdir(directory):
+                    return False  # context manager cleans up
+                msg = "Failed to create cache directory " + path
+                raise SCons.Errors.SConsEnvironmentError(msg) from e
 
     def _readconfig(self, path: str) -> None:
         """Read the cache config from *path*.

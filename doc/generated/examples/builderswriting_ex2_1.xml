@@ -4,6 +4,6 @@ Check spelling, check external program exists in env['ENV']['PATH'],
 and check that a suitable tool is being loaded:
   File "/home/my/project/SConstruct", line 7:
     env.Program('hello.c')
-  File "SCons/Environment.py", line 1309:
+  File "SCons/Environment.py", line 1445:
     raise AttributeError(
 </screen>

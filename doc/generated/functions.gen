@@ -91,7 +91,7 @@ the strings representing how the option can be called,
 while the keyword arguments define attributes of the option.
 For the most part these are the same as for the
 <function>OptionParser.add_option</function>
-method in the standard Python library module
+method in the standard &Python; library module
 <systemitem>optparse</systemitem>,
 but with a few additional capabilities noted below.
 See the
@@ -136,7 +136,7 @@ as long as they can be unambiguously resolved.
 For example, if
 <function>add_option</function> is called to
 define a <option>--devicename</option> option,
-it will recognize <option>--device</option>,
+it will also recognize <option>--device</option>,
 <option>--dev</option>
 and so forth as long as there is no other option
 which could also match to the same abbreviation.
@@ -226,22 +226,17 @@ see the &f-Help; documentation for details.
 
 <note>
 <para>
-As an artifact of the internal implementation,
-the behavior of options added by &AddOption;
-which take option arguments is undefined
-<emphasis>if</emphasis> whitespace
-(rather than an <literal>=</literal> sign) is used as
-the separator on the command line.
-Users should avoid such usage; it is recommended
-to add a note to this effect to project documentation
-if the situation is likely to arise.
-In addition, if the <parameter>nargs</parameter>
-keyword is used to specify more than one following
-option argument (that is, with a value of <constant>2</constant>
-or greater), such arguments would necessarily
-be whitespace separated, triggering the issue.
-Developers should not use &AddOption; this way.
-Future versions of &SCons; will likely forbid such usage.
+Prior to version 4.11.0,
+the behavior when options added by &AddOption;
+are specified with whitespace was undefined and discouraged.
+Such usage covers both the use of a space as the separator
+(<literal>--opt arg</literal> vs
+<literal>--opt=arg</literal>),
+and where the number of option arguments
+(<parameter>nargs</parameter>) is specified as greater than one.
+While this issue has been corrected,
+developers should be aware of it in case the
+project is built with an older &SCons; version.
 </para>
 </note>
 
@@ -836,121 +831,83 @@ Direct
 &scons;
 to maintain a derived-file cache in
 <parameter>cache_dir</parameter>.
-The derived files in the cache will be shared
-among all the builds specifying the same
+Cached files are shared across builds that specify the same
 <parameter>cache_dir</parameter>.
-Specifying a
-<parameter>cache_dir</parameter>
-of
-<constant>None</constant>
-disables derived file caching.
+Setting <parameter>cache_dir</parameter>
+to <constant>None</constant> disables caching.
 </para>
 
 <para>
-Calling the environment method
+The environment method
 &f-link-env-CacheDir;
-limits the effect to targets built
-through the specified &consenv;.
-Calling the global function
-&f-link-CacheDir;
-sets a global default
-that will be used by all targets built
-through &consenvs;
-that do not set up environment-specific
-caching by calling &f-env-CacheDir;.
+applies caching only to targets built
+through that specific &consenv;.
+The global function &f-link-CacheDir;
+sets a default that applies
+to all targets unless overridden by an
+environment-specific call.
 </para>
 
 <para>
-Caching behavior can be configured by passing a specialized cache
-class as the optional <parameter>custom_class</parameter> parameter.
-This class must be a subclass of
-<classname>SCons.CacheDir.CacheDir</classname>.
-&SCons; will internally invoke the custom class for performing
-caching operations.
-If the parameter is omitted or set to
-<constant>None</constant>, &SCons; will use the default
-<classname>SCons.CacheDir.CacheDir</classname> class.
+Caching behavior can be customized by passing a subclass of
+<classname>SCons.CacheDir.CacheDir</classname>
+as the optional <parameter>custom_class</parameter> parameter.
+If omitted or set to <constant>None</constant>,
+&SCons; uses the default class.
 </para>
 
 <para>
-When derived-file caching
-is being used and
-&scons;
-finds a derived file that needs to be rebuilt,
-it will first look in the cache to see if a
-file with matching &buildsig; exists
-(indicating the input file(s) and build action(s)
-were identical to those for the current target),
-and if so, will retrieve the file from the cache.
-&scons;
-will report
+When caching is enabled and &scons;
+needs to rebuild a derived file,
+it first checks the cache for a matching &buildsig;
+(indicating identical inputs and build actions).
+If found, the file is retrieved from the cache.
+Otherwise, &scons; builds the file and
+stores a copy the cache under its &buildsig;.
+</para>
+
+<para>
+By default, &scons; reports
 <computeroutput>Retrieved `file' from cache</computeroutput>
-instead of the normal build message.
-If the derived file is not present in the cache,
-&scons;
-will build it and
-then place a copy of the built file in the cache,
-identified by its &buildsig;, for future use.
+on cache hits.
+Use the
+<link linkend="opt-cache-show"><option>--cache-show</option></link>
+option to hide that the cache was involved
+and display the normal build string instead,
+for consistent log output.
+</para>
+
+<para>
+Disable caching for a specific invocation with the
+<link linkend="opt-cache-disable"><option>--cache-disable</option></link>
+option.
+To allow retreival but prevent updates, use
+<link linkend="opt-cache-readonly"><option>--cache-readonly</option></link>.
 </para>
 
 <para>
 The
-<computeroutput>Retrieved `file' from cache</computeroutput>
-messages are useful for human consumption,
-but less useful when comparing log files between
-&scons; runs which will show differences that are
-noisy and not actually significant.
-To disable,
-use the <option>--cache-show</option> option.
-With this option, &scons; changes printing
-to always show the action that would
-have been used to build the file without caching.
+<link linkend="opt-cache-force"><option>--cache-force</option></link>
+option copies <emphasis>all</emphasis> derived files into the cache,
+even pre-existing ones.
+This helps populate a new cache or update it
+after building with cache updating disabled
+(<link linkend="opt-cache-disable"><option>--cache-disable</option></link>
+or <link linkend="opt-cache-readonly"><option>--cache-readonly</option></link>).
 </para>
 
 <para>
-Derived-file caching
-may be disabled for any invocation
-of &scons; by giving the
-<option>--cache-disable</option>
-command line option;
-cache updating may be disabled, leaving cache
-fetching enabled, by giving the
-<option>--cache-readonly</option> option.
-</para>
-
-<para>
-If the
-<option>--cache-force</option>
-option is used,
-&scons;
-will place a copy of
-<emphasis>all</emphasis>
-derived files into the cache,
-even if they already existed
-and were not built by this invocation.
-This is useful to populate a cache
-the first time a
-<parameter>cache_dir</parameter>
-is used for a build,
-or to bring a cache up to date after
-a build with cache updating disabled
-(<option>--cache-disable</option>
-or <option>--cache-readonly</option>)
-has been done.
-</para>
-
-<para>
-The
+Use
 &f-link-NoCache;
-method can be used to disable caching of specific files.  This can be
-useful if inputs and/or outputs of some tool are impossible to
-predict or prohibitively large.
+to exclude specific files from caching,
+such as those with unpredictable inputs or outputs,
+or excessively large output files.
 </para>
 
 <para>
-Note that (at this time) &SCons; provides no facilities
-for managing the derived-file cache. It is up to the developer
-to arrange for cache pruning, expiry, access control, etc. if needed.
+&SCons; does not provide built-in tools for cache management.
+You will need to handle pruning, expiration,
+access control, and other maintenance tasks manually.
 </para>
 
 </listitem>
@@ -1227,9 +1184,11 @@ for a complete explanation of the arguments and behavior.
   <varlistentry id="f-DebugOptions">
     <term><function>DebugOptions</function>(<parameter>[json]</parameter>)</term>
     <listitem><para>
-Allows setting options for SCons debug options. Currently, the only supported value is
-  <emphasis>json</emphasis> which sets the path to the JSON file created when
-  <literal>--debug=json</literal> is set.
+Allows setting values for SCons debug options.
+Currently, the only supported value is
+<emphasis>json</emphasis> which sets the path to the JSON file created when the
+<link linkend="opt-debug"><option>--debug=json</option></link>
+argument is given.
 </para>
   <example_commands>
 DebugOptions(json='#/build/output/scons_stats.json')
@@ -1812,11 +1771,11 @@ will print something like:
   <varlistentry id="f-EnsurePythonVersion">
     <term><function>EnsurePythonVersion</function>(<parameter>major, minor</parameter>)</term>
     <listitem><para>
-Ensure that the Python version is at least
+Ensure that the &Python; version is at least
 <varname>major</varname>.<varname>minor</varname>.
 This function will
-print out an error message and exit SCons with a non-zero exit code if the
-actual Python version is not late enough.
+print out an error message and exit &SCons; with a non-zero exit code if the
+actual &Python; version is not late enough.
 </para>
 
 <para>
@@ -2079,6 +2038,7 @@ Example:
 </para>
 
 <example_commands>
+# Searches for 'foo' in 'dir1' and 'dir2', returning the node if found
 foo = env.FindFile('foo', ['dir1', 'dir2'])
 </example_commands>
 </listitem>
@@ -2087,16 +2047,16 @@ foo = env.FindFile('foo', ['dir1', 'dir2'])
     <term><function>FindInstalledFiles</function>()</term>
     <term><replaceable>env</replaceable>.<methodname>FindInstalledFiles</methodname>()</term>
     <listitem><para>
-Returns the list of targets set up by the
+Return the list of targets set up by the
 &b-link-Install;
-or
+and
 &b-link-InstallAs;
 builders.
-</para>
-
-<para>
 This function serves as a convenient method to select the contents of
 a binary package.
+The list is populated as &b-Install; and &b-InstallAs; are executed -
+that is, the return reflects builder calls already seen
+but not any calls that may occur later.
 </para>
 
 <para>
@@ -2106,13 +2066,13 @@ Example:
 <example_commands>
 Install('/bin', ['executable_a', 'executable_b'])
 
-# will return the file node list
+# Returns the file node list
 # ['/bin/executable_a', '/bin/executable_b']
 FindInstalledFiles()
 
 Install('/lib', ['some_library'])
 
-# will return the file node list
+# Returns the file node list
 # ['/bin/executable_a', '/bin/executable_b', '/lib/some_library']
 FindInstalledFiles()
 </example_commands>
@@ -2121,46 +2081,32 @@ FindInstalledFiles()
   <varlistentry id="f-FindPathDirs">
     <term><function>FindPathDirs</function>(<parameter>variable</parameter>)</term>
     <listitem><para>
-Returns a function
-(actually a callable Python object)
-intended to be used as the
-<varname>path_function</varname>
-of a Scanner object.
-The returned object will look up the specified
-<varname>variable</varname>
-in a construction environment
-and treat the construction variable's value as a list of
-directory paths that should be searched
-(like
-&cv-link-CPPPATH;,
-&cv-link-LIBPATH;,
-etc.).
+Return a callable object for use as the
+<varname>path_function</varname> of a
+<link linkend="scanner_objects">Scanner object</link>.
+When called, it looks up the specified
+<varname>variable</varname> in the &consenv;
+and treats its value as a list of
+directory paths to search
+(like &cv-link-CPPPATH; or &cv-link-LIBPATH;).
 </para>
 
 <para>
-Note that use of
-&f-FindPathDirs;
-is generally preferable to
-writing your own
+Using &f-FindPathDirs;
+is generally preferable to writing your own
 <varname>path_function</varname>
-for the following reasons:
-1) The returned list will contain all appropriate directories
-found in source trees
-(when
-&f-link-VariantDir;
-is used)
-or in code repositories
-(when
-&f-Repository;
-or the
-<option>-Y</option>
-option are used).
-2) scons will identify expansions of
-<varname>variable</varname>
-that evaluate to the same list of directories as,
-in fact, the same list,
-and avoid re-scanning the directories for files,
-when possible.
+because it handles common &SCons;
+scanning cases correctly and efficiently:
+(1) it returns all appropriate directories
+from source trees when a variant directory is used,
+and from repositories when
+&f-link-Repository; or the
+<link linkend="opt-repository"><option>-Y/--repository</option></link>
+option is in effect.
+(2) it detects when different values of
+<varname>variable</varname> resolve to the same directory list and
+reuses that result instead of rescanning the same directories,
+avoiding redundant work.
 </para>
 
 <para>
@@ -2172,28 +2118,23 @@ def my_scan(node, env, path, arg):
     # Code to scan file contents goes here...
     return include_files
 
-scanner = Scanner(name = 'myscanner',
-                  function = my_scan,
-                  path_function = FindPathDirs('MYPATH'))
+scanner = Scanner(
+    name='myscanner', function=my_scan, path_function=FindPathDirs('MYPATH')
+)
 </example_commands>
 </listitem>
   </varlistentry>
   <varlistentry id="f-FindSourceFiles">
-    <term><function>FindSourceFiles</function>(<parameter>node='"."'</parameter>)</term>
-    <term><replaceable>env</replaceable>.<methodname>FindSourceFiles</methodname>(<parameter>node='"."'</parameter>)</term>
+    <term><function>FindSourceFiles</function>(<parameter>[node]</parameter>)</term>
+    <term><replaceable>env</replaceable>.<methodname>FindSourceFiles</methodname>(<parameter>[node]</parameter>)</term>
     <listitem><para>
-Returns the list of nodes which serve as the source of the built files.
-It does so by inspecting the dependency tree starting at the optional
-argument
-<parameter>node</parameter>
-which defaults to the '"."'-node. It will then return all leaves of
-<parameter>node</parameter>.
-These are all children which have no further children.
-</para>
-
-<para>
-This function is a convenient method to select the contents of a Source
-Package.
+Return the list of nodes which represent the sources of the built files.
+It does so by recursively inspecting the dependency tree starting at the optional
+argument <parameter>node</parameter>,
+which defaults to the current directory (<literal>"."</literal>).
+It returns all leaf nodes (files with no further dependencies) from the tree.
+This function serves as a convenient method to select the contents of
+a source package.
 </para>
 
 <para>
@@ -2213,8 +2154,9 @@ FindSourceFiles('src')
 </example_commands>
 
 <para>
-As you can see, build support files (&SConstruct; in the above example)
-will also be returned by this function.
+Notice that build support files in the tree
+(&SConstruct; in the above example)
+are also returned.
 </para>
 </listitem>
   </varlistentry>
@@ -2280,7 +2222,7 @@ when the build failure occurred.
 <para>
 <literal>.status</literal>
 The numeric exit status
-returned by the command or Python function
+returned by the command or &Python; function
 that failed when trying to build the
 specified Node.
 </para>
@@ -2362,8 +2304,8 @@ Its primary intended use is
 for functions that will be
 executed before SCons exits
 by passing them to the
-standard Python
-<function>atexit.register</function>()
+standard &Python;
+<function>atexit.register</function>
 function.
 Example:
 </para>
@@ -2423,16 +2365,9 @@ file is found.
 Query the value of settable option <parameter>name</parameter>,
 which may have been set on the command line, via option defaults,
 or using the &f-link-SetOption; function.
-The value of the option is returned in a type matching how the
-option was declared - see the documentation of the
-corresponding command line option for information about each specific
-option.
-</para>
-
-<para>
-<parameter>name</parameter> can be an entry from the following table,
-which shows the corresponding command line arguments
+The table shows the corresponding command line arguments
 that could affect the value.
+Options are stored using the indicated type.
 <parameter>name</parameter> can be also be the destination
 variable name from a project-specific option added using the
 &f-link-AddOption; function, as long as that addition has been
@@ -2455,7 +2390,7 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
   <entry>
     <link linkend="opt-cache-debug"><option>--cache-debug</option></link>
   </entry>
-
+  <entry>String (filename)</entry>
 </row>
 <row>
   <entry><varname>cache_disable</varname></entry>
@@ -2465,6 +2400,7 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--no-cache</option>
     </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>cache_force</varname></entry>
@@ -2474,18 +2410,21 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--cache-populate</option>
     </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>cache_readonly</varname></entry>
   <entry>
     <link linkend="opt-cache-readonly"><option>--cache-readonly</option></link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>cache_show</varname></entry>
   <entry>
     <link linkend="opt-cache-show"><option>--cache-show</option></link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>clean</varname></entry>
@@ -2496,26 +2435,35 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--remove</option>
     </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>climb_up</varname></entry>
   <entry>
+    <link linkend="opt-D"><option>-D</option></link>,
+    <link linkend="opt-U"><option>-U</option></link>,
     <link linkend="opt-up">
-      <option>-D</option>,
-      <option>-U</option>,
       <option>-u</option>,
       <option>--up</option>,
       <option>--search_up</option>
     </link>
   </entry>
+  <entry>
+    Integer.
+    1 means <option>-u</option> was given,
+    2 is <option>-D</option>,
+    3 is <option>-U</option>.
+  </entry>
 </row>
 <row>
   <entry><varname>config</varname></entry>
-  <entry><option>--config</option></entry>
+  <entry><link linkend="opt-config"><option>--config</option></link></entry>
+  <entry>String</entry>
 </row>
 <row>
   <entry><varname>debug</varname></entry>
   <entry><link linkend="opt-debug"><option>--debug</option></link></entry>
+  <entry>List</entry>
 </row>
 <row>
   <entry><varname>directory</varname></entry>
@@ -2525,27 +2473,31 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--directory</option>
     </link>
   </entry>
+  <entry>List (paths)</entry>
 </row>
 <row>
   <entry><varname>diskcheck</varname></entry>
   <entry><link linkend="opt-diskcheck"><option>--diskcheck</option></link></entry>
+  <entry>List</entry>
 </row>
 <row>
   <entry><varname>duplicate</varname></entry>
   <entry><link linkend="opt-duplicate"><option>--duplicate</option></link></entry>
+  <entry>String</entry>
 </row>
 <row>
   <entry><varname>enable_virtualenv</varname></entry>
   <entry>
     <link linkend="opt-enable-virtualenv"><option>--enable-virtualenv</option></link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>experimental</varname></entry>
   <entry>
     <link linkend="opt-experimental"><option>--experimental</option></link>
   </entry>
-  <entry><emphasis>Since 4.2</emphasis>.</entry>
+  <entry>Set. <emphasis>Since 4.2</emphasis>.</entry>
 </row>
 <row>
   <entry><varname>file</varname></entry>
@@ -2557,6 +2509,7 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--sconstruct</option>
     </link>
   </entry>
+  <entry>List (filenames)</entry>
 </row>
 <row>
   <entry><varname>hash_chunksize</varname></entry>
@@ -2564,13 +2517,14 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
     <link linkend="opt-hash-chunksize"><option>--hash-chunksize</option></link>
   </entry>
   <entry>
-    Replaces <option>md5_chunksize</option>. <emphasis>Since 4.2</emphasis>
+    Integer. Supersedes <option>md5_chunksize</option>.
+    <emphasis>Since 4.2</emphasis>
   </entry>
 </row>
 <row>
   <entry><varname>hash_format</varname></entry>
   <entry><link linkend="opt-hash-format"><option>--hash-format</option></link></entry>
-  <entry><emphasis>Since 4.2</emphasis></entry>
+  <entry>String. <emphasis>Since 4.2</emphasis></entry>
 </row>
 <row>
   <entry><varname>help</varname></entry>
@@ -2579,6 +2533,7 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
         <option>-h</option>, <option>--help</option>
       </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>ignore_errors</varname></entry>
@@ -2588,24 +2543,28 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--ignore-errors</option>
     </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>ignore_virtualenv</varname></entry>
   <entry>
     <link linkend="opt-ignore-virtualenv"><option>--ignore-virtualenv</option></link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>implicit_cache</varname></entry>
   <entry>
     <link linkend="opt-implicit-cache"><option>--implicit-cache</option></link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>implicit_deps_changed</varname></entry>
   <entry>
     <link linkend="opt-implicit-deps-changed"><option>--implicit-deps-changed</option></link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>implicit_deps_unchanged</varname></entry>
@@ -2614,6 +2573,7 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--implicit-deps-unchanged</option>
     </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>include_dir</varname></entry>
@@ -2623,13 +2583,14 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--include-dir</option>
     </link>
   </entry>
+  <entry>List (paths)</entry>
 </row>
 <row>
   <entry><varname>install_sandbox</varname></entry>
   <entry>
     <link linkend="opt-install-sandbox"><option>--install-sandbox</option></link>
   </entry>
-  <entry>Available only if the &t-link-install; tool has been called</entry>
+  <entry>String (filename). Available only if the &t-link-install; tool has been called</entry>
 </row>
 <row>
   <entry><varname>keep_going</varname></entry>
@@ -2639,10 +2600,12 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--keep-going</option>
     </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>max_drift</varname></entry>
   <entry><link linkend="opt-max-drift"><option>--max-drift</option></link></entry>
+  <entry>Integer</entry>
 </row>
 <row>
   <entry><varname>md5_chunksize</varname></entry>
@@ -2650,7 +2613,7 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
     <link linkend="opt-hash-chunksize"><option>--hash-chunksize</option></link>
   </entry>
   <entry>
-    Replaced by <option>hash_chunksize</option>.
+    Integer. Superseded by <option>hash_chunksize</option>.
     <emphasis>Deprecated since 4.2</emphasis>
   </entry>
 </row>
@@ -2665,27 +2628,31 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--recon</option>
     </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>no_progress</varname></entry>
   <entry><link linkend="opt-Q"><option>-Q</option></link></entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>num_jobs</varname></entry>
   <entry>
     <link linkend="opt-jobs"><option>-j</option>, <option>--jobs</option></link>
   </entry>
+  <entry>Integer</entry>
 </row>
 <row>
   <entry><varname>package_type</varname></entry>
   <entry>
     <link linkend="opt-package-type"><option>--package-type</option></link>
   </entry>
-  <entry>Available only if the &t-link-packaging; tool has been called</entry>
+  <entry>String. Available only if the &t-link-packaging; tool has been called</entry>
 </row>
 <row>
   <entry><varname>profile_file</varname></entry>
   <entry><link linkend="opt-profile"><option>--profile</option></link></entry>
+  <entry>String (filename)</entry>
 </row>
 <row>
   <entry><varname>question</varname></entry>
@@ -2695,12 +2662,14 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--question</option>
     </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>random</varname></entry>
   <entry>
     <link linkend="opt-random"><option>--random</option></link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>repository</varname></entry>
@@ -2711,6 +2680,7 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--srcdir</option>
     </link>
   </entry>
+  <entry>List (paths)</entry>
 </row>
 <row>
   <entry><varname>silent</varname></entry>
@@ -2721,6 +2691,7 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--quiet</option>
     </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 <row>
   <entry><varname>site_dir</varname></entry>
@@ -2728,22 +2699,26 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
     <link linkend="opt-site-dir"><option>--site-dir</option></link>,
     <link linkend="opt-no-site-dir"><option>--no-site-dir</option></link>
   </entry>
+  <entry>String (path), False or None</entry>
 </row>
 <row>
   <entry><varname>stack_size</varname></entry>
   <entry>
     <link linkend="opt-stack-size"><option>--stack-size</option></link>
   </entry>
+  <entry>Integer</entry>
 </row>
 <row>
   <entry><varname>taskmastertrace_file</varname></entry>
   <entry>
     <link linkend="opt-taskmastertrace"><option>--taskmastertrace</option></link>
   </entry>
+  <entry>String (filename)</entry>
 </row>
 <row>
   <entry><varname>tree_printers</varname></entry>
   <entry><link linkend="opt-tree"><option>--tree</option></link></entry>
+  <entry>List</entry>
 </row>
 <row>
   <entry><varname>warn</varname></entry>
@@ -2753,6 +2728,7 @@ processed prior to the &f-GetOption; call in the &SConscript; files.
       <option>--warning</option>
     </link>
   </entry>
+  <entry>List</entry>
 </row>
 
 </tbody>
@@ -2934,7 +2910,7 @@ sources = Glob("*.cpp", exclude=["os_*_specific_*.cpp"]) \
     <listitem><para>
 Adds <parameter>text</parameter> to the help message shown when
 &scons; is called with the
-<option>-h</option> or <option>--help</option>
+<link linkend="opt-help"><option>-h</option> or <option>--help</option></link>
 argument.
 </para>
 <para>
@@ -3399,7 +3375,7 @@ and added to the following &consvars;:
 Any other strings not associated with options
 are assumed to be the names of libraries
 and added to the
-&cv-LIBS; &consvar;.
+&cv-link-LIBS; &consvar;.
 </para>
 
 <para>
@@ -3597,7 +3573,7 @@ evaluating Nodes (e.g. files).
 </para>
 
 <para>
-If the first specified argument is a Python callable
+If the first specified argument is a &Python; callable
 (a function or an object that has a
 <methodname>__call__</methodname> method),
 the function will be called
@@ -4230,7 +4206,7 @@ SConscript('bar/SConscript')	# will chdir to bar
     <term><function>SConsignFile</function>(<parameter>[name, dbm_module]</parameter>)</term>
     <term><replaceable>env</replaceable>.<methodname>SConsignFile</methodname>(<parameter>[name, dbm_module]</parameter>)</term>
     <listitem><para>
-Specify where to store the &SCons; file signature database,
+Specify where to store the &SCons; signature database,
 and which database format to use.
 This may be useful to specify alternate
 database files and/or file locations for different types of builds.
@@ -4238,15 +4214,16 @@ database files and/or file locations for different types of builds.
 <para>
 The optional <parameter>name</parameter> argument
 is the base name of the database file(s).
-If not an absolute path name,
-these are placed relative to the directory containing the
-top-level &SConstruct; file.
+The database is placed relative to the directory containing the
+top-level &SConstruct; file, unless <parameter>name</parameter>
+is an absolute path name.
 The default is
 <filename>.sconsign</filename>.
 The actual database file(s) stored on disk
-may have an appropriate suffix appended
-by the chosen
-<parameter>dbm_module</parameter>
+may have an appropriate suffix appended by the chosen
+<parameter>dbm_module</parameter>,
+and may also include the name of the hash format
+(see <link linkend="opt-hash-format"><option>--hash-format</option></link>).
 </para>
 <para>
 The optional <parameter>dbm_module</parameter>
@@ -4292,10 +4269,16 @@ in a separate
 file in each directory,
 not in a single combined database file.
 This is a backwards-compatibility measure to support
-what was the default behavior
+the behavior that was the default
 prior to &SCons; 0.97 (i.e. before 2008).
-Use of this mode is discouraged and may be
-deprecated in a future &SCons; release.
+Use of this mode is deprecated and should
+not be used in new projects.
+</para>
+
+<para>
+<emphasis>Deprecated since version 4.11.0</emphasis>:
+the signature-file-per-directory mode is deprecated
+and will be removed in a future release.
 </para>
 
 <para>
@@ -4347,22 +4330,24 @@ if 'FOO' not in env:
     <listitem><para>
 Set option variable <parameter>name</parameter>
 to <parameter>value</parameter>.
-Settable  options have corresponding command-line
-arguments, which can be used for one-time overrides,
-as a value set via command-line option will take
+Settable options have corresponding command-line options,
+as shown in the table,
+which can be used for one-time overrides -
+a value set via the command line will take
 precedence over one set with &f-SetOption;.
-The table shows the correspondence between the
-option name and the command-line argument(s).
+In addition to SConscript files,
 &f-SetOption; calls can also be placed in a
 <filename>site_init.py</filename> file.
+The current value can be queried with
+&f-link-GetOption;.
 </para>
 
 <para>
 The behavior of the options is described in the
-manpage entry for the command-line version.
+manpage entry for the associated command-line option.
 The <parameter>value</parameter> parameter is mandatory;
-for option values which are boolean in nature
-(that is, the command line option does not take an argument)
+for boolean option values
+(where the command-line option does not take an option-argument)
 use a <parameter>value</parameter>
 which evaluates to true (e.g. <constant>True</constant>,
 <constant>1</constant>) or false (e.g. <constant>False</constant>,
@@ -4379,7 +4364,7 @@ be read in order to find the &f-SetOption; call in the first place.
 For project-specific options (sometimes called
 <firstterm>local options</firstterm>)
 added via an &f-link-AddOption; call,
-&f-SetOption; is available only after the
+&f-SetOption; is allowed only after the
 &f-AddOption; call has completed successfully,
 and only if that call included the
 <parameter>settable=True</parameter> keyword argument.
@@ -4409,6 +4394,7 @@ The settable variables with their associated command-line options are:
       <option>--remove</option>
     </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 
 <row>
@@ -4416,6 +4402,7 @@ The settable variables with their associated command-line options are:
   <entry>
     <link linkend="opt-diskcheck"><option>--diskcheck</option></link>
   </entry>
+  <entry>List</entry>
 </row>
 
 <row>
@@ -4423,6 +4410,7 @@ The settable variables with their associated command-line options are:
   <entry>
     <link linkend="opt-duplicate"><option>--duplicate</option></link>
   </entry>
+  <entry>String</entry>
 </row>
 
 <row>
@@ -4430,7 +4418,7 @@ The settable variables with their associated command-line options are:
   <entry>
     <link linkend="opt-experimental"><option>--experimental</option></link>
   </entry>
-  <entry><emphasis>Since 4.2</emphasis>.</entry>
+  <entry>Set. <emphasis>Since 4.2</emphasis>.</entry>
 </row>
 
 <row>
@@ -4439,7 +4427,8 @@ The settable variables with their associated command-line options are:
     <link linkend="opt-hash-chunksize"><option>--hash-chunksize</option></link>
   </entry>
   <entry>
-    Replaces <option>md5_chunksize</option>. <emphasis>Since 4.2</emphasis>
+    Integer. Supersedes <option>md5_chunksize</option>.
+    <emphasis>Since 4.2</emphasis>
   </entry>
 </row>
 
@@ -4448,7 +4437,7 @@ The settable variables with their associated command-line options are:
   <entry>
     <link linkend="opt-hash-format"><option>--hash-format</option></link>
   </entry>
-  <entry><emphasis>Since 4.2</emphasis></entry>
+  <entry>String. <emphasis>Since 4.2</emphasis></entry>
 </row>
 
 <row>
@@ -4456,6 +4445,7 @@ The settable variables with their associated command-line options are:
   <entry>
     <link linkend="opt-H"><option>-h</option>, <option>--help</option></link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 
 <!-- XXX   <varlistentry id="opt-ignore-errors"> ?? -->
@@ -4465,6 +4455,7 @@ The settable variables with their associated command-line options are:
   <entry>
     <link linkend="opt-implicit-cache"><option>--implicit-cache</option></link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 
 <row>
@@ -4475,7 +4466,7 @@ The settable variables with their associated command-line options are:
     </link>
   </entry>
   <entry>
-    Also sets <varname>implicit_cache</varname>.
+    Boolean. Also sets <varname>implicit_cache</varname>.
     <emphasis>Settable since 4.2</emphasis>
   </entry>
 </row>
@@ -4488,7 +4479,7 @@ The settable variables with their associated command-line options are:
     </link>
   </entry>
   <entry>
-    Also sets <varname>implicit_cache</varname>.
+    Boolean. Also sets <varname>implicit_cache</varname>.
     <emphasis>Settable since 4.2</emphasis>
   </entry>
 </row>
@@ -4500,6 +4491,7 @@ The settable variables with their associated command-line options are:
   <entry>
     <link linkend="opt-max-drift"><option>--max-drift</option></link>
   </entry>
+  <entry>Integer</entry>
 </row>
 
 <row>
@@ -4508,7 +4500,7 @@ The settable variables with their associated command-line options are:
     <link linkend="opt-hash-chunksize"><option>--hash-chunksize</option></link>
   </entry>
   <entry>
-    Synonym for <option>hash_chunksize</option>.
+    Integer. Superseded by <option>hash_chunksize</option>.
     <emphasis>Deprecated since 4.2</emphasis>
   </entry>
 </row>
@@ -4524,6 +4516,7 @@ The settable variables with their associated command-line options are:
       <option>--recon</option>
     </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 
 <row>
@@ -4531,7 +4524,7 @@ The settable variables with their associated command-line options are:
   <entry>
     <link linkend="opt-Q"><option>-Q</option></link>
   </entry>
-  <entry>See
+  <entry>Boolean. See
     <footnote>
       <para>If <varname>no_progress</varname> is set via &f-SetOption;
       in an SConscript file
@@ -4550,11 +4543,13 @@ The settable variables with their associated command-line options are:
   <entry>
     <link linkend="opt-jobs"><option>-j</option>, <option>--jobs</option></link>
   </entry>
+  <entry>Integer</entry>
 </row>
 
 <row>
   <entry><varname>random</varname></entry>
   <entry><link linkend="opt-random"><option>--random</option></link></entry>
+  <entry>Boolean</entry>
 </row>
 
 <row>
@@ -4566,6 +4561,7 @@ The settable variables with their associated command-line options are:
       <option>--quiet</option>
     </link>
   </entry>
+  <entry>Boolean</entry>
 </row>
 
 <row>
@@ -4573,11 +4569,13 @@ The settable variables with their associated command-line options are:
   <entry>
     <link linkend="opt-stack-size"><option>--stack-size</option></link>
   </entry>
+  <entry>Integer</entry>
 </row>
 
 <row>
   <entry><varname>warn</varname></entry>
   <entry><link linkend="opt-warn"><option>--warn</option></link></entry>
+  <entry>List</entry>
 </row>
 
 </tbody>
@@ -4952,13 +4950,13 @@ gltool(env)  # adds 'opengl' to the TOOLS variable
       </para>
 
       <screen>
-$ <userinput>scons --compilers=mingw</userinput>  # the correct flag is --compiler
+$ <userinput>scons --complier=mingw</userinput>  # the correct flag is --compiler
       </screen>
 
       <para>
-        Here &SCons; could go off and run a bunch of configure steps with
-        the default value of <literal>--compiler</literal>, since the
-        incorrect command line did not actually supply a value to it,
+        Here &SCons; could go off and run a bunch of configure steps using
+        the default value of <option>--compiler</option>, since the
+        misspelled option causes it not to be supplied the intended value,
         costing developer time to track down why the configure logic
         made the "wrong" choices.  This example shows catching this:
       </para>
@@ -5076,12 +5074,12 @@ env.UpdateValue(target=Value(output), source=Value(input))
     <term><function>VariantDir</function>(<parameter>variant_dir, src_dir, [duplicate]</parameter>)</term>
     <term><replaceable>env</replaceable>.<methodname>VariantDir</methodname>(<parameter>variant_dir, src_dir, [duplicate]</parameter>)</term>
     <listitem><para>
-Sets up a mapping to define a variant build directory in
+Set up a mapping to define a variant build directory in
 <parameter>variant_dir</parameter>.
 <parameter>src_dir</parameter> must not be underneath
 <parameter>variant_dir</parameter>.
-A &f-VariantDir; mapping is global, even if called using the
-&f-env-VariantDir; form.
+A &f-VariantDir; mapping is global, even when called as
+&f-env-VariantDir;.
 &f-VariantDir;
 can be called multiple times with the same
 <parameter>src_dir</parameter>
@@ -5089,100 +5087,105 @@ to set up multiple variant builds with different options.
 </para>
 
 <para>
-Note if <parameter>variant_dir</parameter>
-is not under the project top directory,
-target selection rules will not pick targets in the
+Note that while <parameter>variant_dir</parameter>
+can be any convenient location,
+if it is not under the project top directory,
+normal target selection rules will not pick targets in the
 variant directory unless they are explicitly specified.
 </para>
 
 <para>
-When files in <parameter>variant_dir</parameter> are referenced,
-&SCons; backfills as needed with files from <parameter>src_dir</parameter>
-to create a complete build directory.
+When files under <parameter>variant_dir</parameter> are referenced,
+&SCons; backfills missing files from <parameter>src_dir</parameter>
+as needed to create a complete build tree.
 By default, &SCons;
-physically duplicates the source files, SConscript files,
-and directory structure as needed into the variant directory.
-Thus, a build performed in the variant directory is guaranteed to be identical
-to a build performed in the source directory even if
-intermediate source files are generated during the build,
-or if preprocessors or other scanners search for included files
-using paths relative to the source file,
-or if individual compilers or other invoked tools are hard-coded
-to put derived files in the same directory as source files.
-Only the files &SCons; calculates are needed for the build are
+physically duplicates source files, subsidiary &SConscript; files,
+and any needed directory structure into the variant directory.
+This makes a build in the variant directory equivalent to a build in the
+source tree, even when intermediate source files are generated,
+scanners search for included files using source-relative paths,
+or tools are hard-coded to emit derived files beside their sources.
+Only the files &SCons; determines are needed for the build are
 duplicated into <parameter>variant_dir</parameter>.
-If possible on the platform,
-the duplication is performed by linking rather than copying.
-This behavior is affected by the
-<option>--duplicate</option>
-command-line option.
+Where possible, duplication is performed by linking rather than copying.
+The duplication strategy can be adjusted using the
+<link linkend="opt-duplicate"><option>--duplicate</option></link>
+command-line option or &f-link-SetOption;.
 </para>
 
 <para>
-Duplicating the source files may be disabled by setting the
-<parameter>duplicate</parameter>
-argument to
-<constant>False</constant>.
-This will cause
-&SCons;
-to invoke Builders using the path names of source files in
-<parameter>src_dir</parameter>
-and the path names of derived files within
-<parameter>variant_dir</parameter>.
-This is more efficient than duplicating,
-and is safe for most builds;
-revert to <literal>duplicate=True</literal>
-if it causes problems.
+If the <parameter>duplicate</parameter> argument is set to
+<constant>False</constant>,
+&SCons; does not duplicate source files.
+Instead, it automatically invokes builders using the original source paths
+from <parameter>src_dir</parameter>
+and derived file paths in <parameter>variant_dir</parameter>.
+This is more efficient than duplicating and is safe for most builds;
+if it causes problems, use <literal>duplicate=True</literal> (the default).
 </para>
+
+<note>
+<para>
+When switching an existing variant directory
+from duplicating to non-duplicating,
+previously duplicated source files are not automatically removed.
+&SCons; will continue to prefer these stale copies over the original sources,
+possibly preventing detection of changes to the originals.
+To avoid this issue, clean the build tree before switching.
+After the switch,
+&SCons; no longer tracks duplicated files in the variant directory
+and will not remove them during cleaning.
+</para>
+</note>
+
+<para>
+Variant directories can also be established using the
+&f-link-SConscript; function
+in conjunction with calling a subsidiary &SConscript; file.
+</para>
+
+<para>
+Examples:
+</para>
+
+<example_commands>
+# use names in the build directory, not the source directory
+VariantDir('build', 'src', duplicate=False)
+Program('build/prog', 'build/source.c')
+
+# this builds both the source and docs in a separate subtree
+VariantDir('build', '.', duplicate=False)
+SConscript(dirs=['build/src', 'build/doc'])
+
+# same as previous example, but only uses SConscript
+SConscript(dirs='src', variant_dir='build/src', duplicate=False)
+SConscript(dirs='doc', variant_dir='build/doc', duplicate=False)
+</example_commands>
 
 <para>
 &f-VariantDir;
-works most naturally when used with a subsidiary SConscript file.
-The subsidiary SConscript file must be called as if it were in
+works most naturally when used with a subsidiary &SConscript; file.
+The subsidiary &SConscript; must be called as if it were in
 <parameter>variant_dir</parameter>,
 regardless of the value of
 <parameter>duplicate</parameter>.
-When calling an SConscript file, you can use the
-<parameter>exports</parameter> keyword argument
-to pass parameters (individually or as an appropriately set up environment)
-so the SConscript can pick up the right settings for that variant build.
-The SConscript must &f-link-Import; these to use them. Example:
+Use the <parameter>exports</parameter> keyword argument to pass
+parameters or an appropriately configured environment object
+so the subsidiary &SConscript; can pick up the right settings
+for that variant build.
+The &SConscript; must &f-link-Import;
+these exported values before using them.
 </para>
 
 <example_commands>
 env1 = Environment(...settings for variant1...)
 env2 = Environment(...settings for variant2...)
 
-# run src/SConscript in two variant directories
+# run src/SConscript by using the variant dir paths
 VariantDir('build/variant1', 'src')
 SConscript('build/variant1/SConscript', exports={"env": env1})
 VariantDir('build/variant2', 'src')
 SConscript('build/variant2/SConscript', exports={"env": env2})
-</example_commands>
-
-<para>
-See also the
-&f-link-SConscript; function
-for another way to specify a variant directory
-in conjunction with calling a subsidiary SConscript file.
-</para>
-
-<para>
-More examples:
-</para>
-
-<example_commands>
-# use names in the build directory, not the source directory
-VariantDir('build', 'src', duplicate=0)
-Program('build/prog', 'build/source.c')
-
-# this builds both the source and docs in a separate subtree
-VariantDir('build', '.', duplicate=0)
-SConscript(dirs=['build/src','build/doc'])
-
-# same as previous example, but only uses SConscript
-SConscript(dirs='src', variant_dir='build/src', duplicate=0)
-SConscript(dirs='doc', variant_dir='build/doc', duplicate=0)
 </example_commands>
 </listitem>
   </varlistentry>
